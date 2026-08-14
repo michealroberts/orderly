@@ -1,0 +1,9 @@
+packages:
+  - "."
+
+# Pin every dependency to an exact version. Several tools in this toolchain are
+# pre-1.0 (oxfmt, @cloudflare/vitest-pool-workers), where minor bumps can break.
+saveExact: true
+
+# Refuse to install on a Node version outside the `engines` range in package.json.
+engineStrict: true
