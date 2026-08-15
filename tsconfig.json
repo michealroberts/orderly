@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    // workerd tracks V8 closely, so there is no reason to downlevel. tsdown
+    // handles emit later; this target only governs which syntax typechecks.
+    "target": "es2024",
+
+    // Deliberately no "DOM". orderly runs on workerd, not in a browser, and
+    // @cloudflare/workers-types supplies the runtime globals it does have
+    // (fetch, Request, Response, Queue, MessageBatch). Pulling in DOM would
+    // let browser-only APIs typecheck against a runtime that lacks them.
+    "lib": ["es2024"],
+    "types": ["@cloudflare/workers-types"],
+
+    // "preserve" leaves import syntax untouched and implies bundler
+    // resolution, which is what tsdown/rolldown expects downstream.
+    "module": "preserve",
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+
+    // tsc is a typechecker here, never a compiler. tsdown owns emit.
+    "noEmit": true,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "exactOptionalPropertyTypes": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src"]
+}

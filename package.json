@@ -24,5 +24,12 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@11.21.0"
+  "packageManager": "pnpm@11.21.0",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260801.1",
+    "typescript": "7.0.2"
+  }
 }
