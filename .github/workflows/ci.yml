@@ -121,6 +121,11 @@ jobs:
       - name: Build
         run: pnpm build
 
+      # Runs in this job rather than its own because both tools pack the real
+      # tarball, which only exists once the build has run.
+      - name: Lint package
+        run: pnpm lint:package
+
   typecheck:
     name: typecheck (node ${{ matrix.node }})
     runs-on: ubuntu-latest
