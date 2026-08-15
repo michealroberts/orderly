@@ -1,0 +1,28 @@
+{
+  "name": "@observerly/orderly",
+  "version": "0.0.0",
+  "description": "Single file, no pushing. Type-safe middleware that brings a little bit of order to Cloudflare Queues.",
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "workerd",
+    "queues",
+    "middleware",
+    "typescript"
+  ],
+  "homepage": "https://github.com/michealroberts/orderly#readme",
+  "bugs": {
+    "url": "https://github.com/michealroberts/orderly/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michealroberts/orderly.git"
+  },
+  "license": "MIT",
+  "author": "Michael Roberts <michael@observerly.com>",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@11.21.0"
+}
