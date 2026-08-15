@@ -1,5 +1,7 @@
-packages:
-  - '.'
+# This file carries pnpm settings only. There is deliberately no `packages`
+# key: orderly is a single package, and declaring a workspace makes changesets
+# treat the repository as a monorepo, which tags releases `@observerly/orderly@x`
+# rather than `vx`. Adding one back silently changes the tag format.
 
 # Pin every dependency to an exact version. Several tools in this toolchain are
 # pre-1.0 (oxfmt, @cloudflare/vitest-pool-workers), where minor bumps can break.
