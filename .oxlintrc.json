@@ -24,6 +24,10 @@
     // here would create a second, competing opinion about layout.
   },
   "rules": {},
+  // Type-aware rules are not switched on here via options.typeAware, because
+  // that would make every invocation build a TypeScript program. They are
+  // opted into by the lint:types script instead, so the plain lint run stays
+  // fast enough for a pre-commit hook.
   "env": {
     "builtin": true
   },

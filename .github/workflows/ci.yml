@@ -66,6 +66,12 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      # Runs as a second step in this job rather than as a job of its own, so
+      # the install is shared. It is kept separate from the step above so a
+      # failure names which of the two passes caught the problem.
+      - name: Lint (type-aware)
+        run: pnpm lint:types
+
   typecheck:
     name: typecheck (node ${{ matrix.node }})
     runs-on: ubuntu-latest
