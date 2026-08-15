@@ -1,0 +1,25 @@
+name: Feature Request
+description: Suggest a capability orderly does not currently have.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What Are You Trying To Do
+      description: >-
+        Describe the queue behaviour you are trying to achieve rather than the API
+        you imagine. There may be a simpler route to it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Approach
+      description: Optional. If you have an API in mind, sketch it here.
+      render: typescript
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What You Have Tried Instead

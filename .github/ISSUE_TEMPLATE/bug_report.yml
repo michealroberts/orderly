@@ -1,0 +1,42 @@
+name: Bug Report
+description: Something in orderly behaves differently to how it is documented.
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What Happened
+      description: What did orderly do, and what did you expect instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: queue-configuration
+    attributes:
+      label: Queue Configuration
+      description: >-
+        The relevant `queues` section of your Wrangler configuration. Batch size,
+        retry limits and any dead letter queue are usually the parts that matter.
+      render: jsonc
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: >-
+        The smallest consumer or middleware chain that shows the problem. A failing
+        test using `createMessageBatch` is ideal, since it runs inside workerd.
+      render: typescript
+
+  - type: input
+    id: version
+    attributes:
+      label: Orderly Version
+    validations:
+      required: true
+
+  - type: input
+    id: compatibility-date
+    attributes:
+      label: Worker Compatibility Date
+      description: From your Wrangler configuration. Runtime behaviour depends on it.
