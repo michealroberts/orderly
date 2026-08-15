@@ -6,4 +6,23 @@
   // Matches the workerd build pinned by the pool, so the runtime under test
   // and the compatibility surface it exposes cannot drift apart.
   "compatibility_date": "2026-08-11",
+  // A producer and a consumer over the same queue, so tests can exercise both
+  // ends of the middleware: sending a message, and receiving it as a batch.
+  // The values mirror a realistic consumer rather than the defaults, so that
+  // batching and retry behaviour is observable in tests.
+  "queues": {
+    "producers": [
+      {
+        "binding": "QUEUE",
+        "queue": "orderly",
+      },
+    ],
+    "consumers": [
+      {
+        "queue": "orderly",
+        "max_batch_size": 10,
+        "max_retries": 3,
+      },
+    ],
+  },
 }
