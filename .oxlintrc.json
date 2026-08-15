@@ -1,0 +1,42 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "typescript",
+    "unicorn",
+    "oxc",
+    // ESM correctness matters more than usual for a published library, where a
+    // bad specifier only surfaces in a consumer's build.
+    "import",
+    // Queue middleware is almost entirely promise handling, and a dropped
+    // promise means a message is silently never acked.
+    "promise"
+    // Deliberately absent: "node". orderly runs on workerd, so Node built-in
+    // rules would validate against a runtime it never executes on.
+  ],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "error",
+    // Pedantic has occasional false positives, so it reports without failing
+    // the build. Promote to error once the API exists and the noise is known.
+    "pedantic": "warn"
+    // Deliberately absent: "style". oxfmt owns formatting, and enabling style
+    // here would create a second, competing opinion about layout.
+  },
+  "rules": {},
+  "env": {
+    "builtin": true
+  },
+  "overrides": [
+    {
+      // The entrypoint is currently `export {}`, the TypeScript idiom for
+      // marking a file as a module. unicorn flags that as an empty specifier,
+      // which is correct for every other file. Delete this override once the
+      // entrypoint exports a real API.
+      "files": ["src/index.ts"],
+      "rules": {
+        "unicorn/require-module-specifiers": "off"
+      }
+    }
+  ]
+}

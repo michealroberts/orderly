@@ -41,6 +41,31 @@ jobs:
       - name: Check formatting
         run: pnpm format:check
 
+  # oxlint is likewise a native binary, so it runs once for the same reason as
+  # the format job. Type-aware rules are not enabled here; they need the
+  # TypeScript compiler and arrive separately.
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
   typecheck:
     name: typecheck (node ${{ matrix.node }})
     runs-on: ubuntu-latest
