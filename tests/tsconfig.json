@@ -7,8 +7,8 @@
     // globals have to be repeated here alongside the pool's own types.
     "types": ["@cloudflare/workers-types", "@cloudflare/vitest-pool-workers/types"]
   },
-  // vitest.config.ts is included here rather than in the root project because
-  // it imports from the pool, and the root project deliberately does not know
-  // about test tooling.
-  "include": ["./**/*.ts", "../vitest.config.ts"]
+  // This project covers every TypeScript file that is not shipped: the tests
+  // themselves plus the root tooling configs. Those are kept out of the root
+  // project so that it describes only what ends up in the published bundle.
+  "include": ["./**/*.ts", "../vitest.config.ts", "../rolldown.config.ts"]
 }
