@@ -4,32 +4,35 @@
   "description": "Single file, no pushing. Type-safe middleware that brings a little bit of order to Cloudflare Queues.",
   "keywords": [
     "cloudflare",
-    "workers",
-    "workerd",
-    "queues",
     "middleware",
-    "typescript"
+    "queues",
+    "typescript",
+    "workerd",
+    "workers"
   ],
   "homepage": "https://github.com/michealroberts/orderly#readme",
   "bugs": {
     "url": "https://github.com/michealroberts/orderly/issues"
   },
+  "license": "MIT",
+  "author": "Michael Roberts <michael@observerly.com>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/michealroberts/orderly.git"
   },
-  "license": "MIT",
-  "author": "Michael Roberts <michael@observerly.com>",
   "type": "module",
-  "engines": {
-    "node": ">=24"
-  },
-  "packageManager": "pnpm@11.21.0",
   "scripts": {
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20260801.1",
+    "oxfmt": "0.63.0",
     "typescript": "7.0.2"
-  }
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@11.21.0"
 }
