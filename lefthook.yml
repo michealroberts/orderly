@@ -1,0 +1,18 @@
+# Jobs run in order rather than in parallel. oxfmt rewrites files and oxlint
+# then reads them, so running them concurrently would let the linter see
+# pre-format content.
+pre-commit:
+  jobs:
+    - name: format
+      glob: '*.{ts,js,json,jsonc,yaml,yml,md}'
+      run: pnpm exec oxfmt {staged_files}
+      # oxfmt writes in place, so anything it fixes has to be re-staged or the
+      # commit would record the unformatted version.
+      stage_fixed: true
+
+    - name: lint
+      glob: '*.{ts,js}'
+      run: pnpm exec oxlint {staged_files}
+# Deliberately absent: type-aware linting, typecheck and tests. Those need the
+# whole program rather than the staged subset, and belong in CI where they do
+# not sit between the author and a commit.
