@@ -97,6 +97,30 @@ jobs:
       - name: Test
         run: pnpm test
 
+  # The bundle is produced by rolldown, a native binary, so like the other
+  # native tools it does not vary by Node version and runs once.
+  build:
+    name: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
   typecheck:
     name: typecheck (node ${{ matrix.node }})
     runs-on: ubuntu-latest
