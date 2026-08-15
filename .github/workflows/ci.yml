@@ -72,6 +72,31 @@ jobs:
       - name: Lint (type-aware)
         run: pnpm lint:types
 
+  # Tests execute inside workerd, not Node, so the Node version under which
+  # vitest is launched has no bearing on the result. This runs once for the
+  # same reason as the format and lint jobs.
+  test:
+    name: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Test
+        run: pnpm test
+
   typecheck:
     name: typecheck (node ${{ matrix.node }})
     runs-on: ubuntu-latest

@@ -1,0 +1,14 @@
+{
+  // Tests inherit the library's strictness but need a wider type surface: the
+  // pool contributes the `cloudflare:test` module, which src must never see.
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    // `types` replaces rather than merges when extending, so the workerd
+    // globals have to be repeated here alongside the pool's own types.
+    "types": ["@cloudflare/workers-types", "@cloudflare/vitest-pool-workers/types"]
+  },
+  // vitest.config.ts is included here rather than in the root project because
+  // it imports from the pool, and the root project deliberately does not know
+  // about test tooling.
+  "include": ["./**/*.ts", "../vitest.config.ts"]
+}

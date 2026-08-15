@@ -7,3 +7,12 @@ saveExact: true
 
 # Refuse to install on a Node version outside the `engines` range in package.json.
 engineStrict: true
+
+# pnpm blocks dependency install scripts by default. Both entries below are
+# required rather than convenient: workerd's install script fetches the Workers
+# runtime binary that tests execute inside, and esbuild's fetches the platform
+# binary that @cloudflare/vitest-pool-workers bundles test modules with. Without
+# these, the test suite cannot start at all.
+allowBuilds:
+  esbuild: true
+  workerd: true
