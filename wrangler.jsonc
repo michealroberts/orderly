@@ -1,0 +1,9 @@
+{
+  // orderly is a library, not a Worker. This file exists only so
+  // @cloudflare/vitest-pool-workers has a runtime configuration to boot
+  // workerd with; nothing here is deployed.
+  "name": "orderly",
+  // Matches the workerd build pinned by the pool, so the runtime under test
+  // and the compatibility surface it exposes cannot drift apart.
+  "compatibility_date": "2026-08-11",
+}

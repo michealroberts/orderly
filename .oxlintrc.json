@@ -9,7 +9,10 @@
     "import",
     // Queue middleware is almost entirely promise handling, and a dropped
     // promise means a message is silently never acked.
-    "promise"
+    "promise",
+    // Catches assertions that never run, such as a bare expect with no
+    // matcher, which otherwise reads as a passing test.
+    "vitest"
     // Deliberately absent: "node". orderly runs on workerd, so Node built-in
     // rules would validate against a runtime it never executes on.
   ],
