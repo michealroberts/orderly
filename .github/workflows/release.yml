@@ -1,0 +1,67 @@
+name: release
+
+on:
+  push:
+    branches: [main]
+
+# Releases must not overlap. Unlike ci, an in-flight run is queued rather than
+# cancelled, so a merge landing mid-release is still published rather than lost.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+
+    permissions:
+      # changesets opens and updates the version pull request.
+      contents: write
+      pull-requests: write
+      # Mints the OIDC token npm exchanges for short-lived publish credentials.
+      # This is what removes the need for a long-lived NPM_TOKEN.
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # changesets reads tags and history to work out what has been
+          # released, so a shallow clone is not enough.
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          # registry-url is deliberately omitted. It makes setup-node write an
+          # .npmrc containing _authToken=${NODE_AUTH_TOKEN}, and with no token
+          # set that placeholder breaks OIDC authentication. The default
+          # registry is npmjs.org, so nothing is lost by leaving it out.
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # dist is gitignored, so the package has to be built before anything is
+      # published. prepack covers the same ground for a manual publish.
+      - name: Build
+        run: pnpm build
+
+      # With no changesets pending this opens or updates a version pull
+      # request. Once that pull request merges, this runs again and publishes.
+      - name: Version or publish
+        uses: changesets/action@v2.1.0
+        with:
+          version: pnpm changeset:version
+          publish: pnpm changeset:publish
+          commit: 'chore: version packages'
+          title: 'chore: version packages'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
