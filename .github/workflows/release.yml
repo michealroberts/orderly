@@ -34,6 +34,11 @@ jobs:
           # released, so a shallow clone is not enough.
           fetch-depth: 0
 
+      # The pnpm version is taken from the packageManager field in package.json,
+      # so it cannot drift from what is used locally.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
       - name: Set up Node
         uses: actions/setup-node@v7
         with:
@@ -42,9 +47,6 @@ jobs:
           # .npmrc containing _authToken=${NODE_AUTH_TOKEN}, and with no token
           # set that placeholder breaks OIDC authentication. The default
           # registry is npmjs.org, so nothing is lost by leaving it out.
-
-      - name: Enable corepack
-        run: corepack enable
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

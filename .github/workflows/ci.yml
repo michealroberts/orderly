@@ -27,13 +27,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # The pnpm version is taken from the packageManager field in package.json,
+      # so it cannot drift from what is used locally.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
       - name: Set up Node
         uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
-
-      - name: Enable corepack
-        run: corepack enable
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -52,13 +54,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # The pnpm version is taken from the packageManager field in package.json,
+      # so it cannot drift from what is used locally.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
       - name: Set up Node
         uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
-
-      - name: Enable corepack
-        run: corepack enable
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -83,13 +87,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # The pnpm version is taken from the packageManager field in package.json,
+      # so it cannot drift from what is used locally.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
       - name: Set up Node
         uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
-
-      - name: Enable corepack
-        run: corepack enable
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -107,13 +113,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # The pnpm version is taken from the packageManager field in package.json,
+      # so it cannot drift from what is used locally.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
       - name: Set up Node
         uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
-
-      - name: Enable corepack
-        run: corepack enable
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -144,15 +152,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # The pnpm version is taken from the packageManager field in package.json,
+      # so it cannot drift from what is used locally.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
       - name: Set up Node
         uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
-
-      # pnpm is resolved from the packageManager field in package.json rather
-      # than installed separately, so CI and local development cannot drift.
-      - name: Enable corepack
-        run: corepack enable
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
