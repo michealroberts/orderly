@@ -84,15 +84,23 @@ export class Run extends DurableObject {
       return 'pending';
     }
 
-    if (steps.some(step => step.event === 'failed')) {
+    // The latest event per step name decides that step's state. Set membership
+    // is not enough: a step that succeeded and then started again is a rerun in
+    // flight, not a settled step, and a step that failed and then started again
+    // is a retry in flight, not a terminal failure.
+    const latest = new Map<string, StepEvent>();
+
+    for (const step of steps) {
+      latest.set(step.name, step.event);
+    }
+
+    const events = [...latest.values()];
+
+    if (events.some(event => event === 'failed')) {
       return 'failed';
     }
 
-    const started = new Set(steps.filter(s => s.event === 'started').map(s => s.name));
-
-    const settled = new Set(steps.filter(s => s.event === 'succeeded').map(s => s.name));
-
-    return [...started].every(name => settled.has(name)) ? 'succeeded' : 'running';
+    return events.every(event => event === 'succeeded') ? 'succeeded' : 'running';
   }
 
   async scheduleAt(when: number): Promise<void> {

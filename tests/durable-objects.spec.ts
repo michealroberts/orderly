@@ -80,6 +80,33 @@ describe('run status inference', () => {
 
 /*****************************************************************************************************************/
 
+// Status has to follow the latest event for each step name, not whether a name
+// has ever settled. A step running again after settling is in flight, whatever
+// its history says.
+describe('run status inference across reruns', () => {
+  it('reports running while a settled step is rerunning', async () => {
+    await runInDurableObject(stub('rerunning'), (instance: Run) => {
+      instance.record('charge', 'started', 1000);
+      instance.record('charge', 'succeeded', 2000);
+      instance.record('charge', 'started', 3000);
+
+      expect(instance.status()).toBe('running');
+    });
+  });
+
+  it('reports running while a failed step is retrying', async () => {
+    await runInDurableObject(stub('retrying'), (instance: Run) => {
+      instance.record('charge', 'started', 1000);
+      instance.record('charge', 'failed', 2000);
+      instance.record('charge', 'started', 3000);
+
+      expect(instance.status()).toBe('running');
+    });
+  });
+});
+
+/*****************************************************************************************************************/
+
 describe('alarms', () => {
   it('stores an alarm at an exact millisecond', async () => {
     const at = 1_900_000_000_123;
