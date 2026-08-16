@@ -65,14 +65,21 @@ cd orderly
 
 ### 3. Setup
 
-The Node version is pinned in `.nvmrc` and the package manager in `package.json`, so both come from
-the repository rather than from whatever you happen to have installed:
+The quickest route is the development container. Open the repository in an editor that supports Dev
+Containers and it arrives with the pinned Node and pnpm already in place, with dependencies
+installed. Nothing else in this section applies.
+
+To work on the host instead, you need Node and pnpm:
 
 ```bash
-nvm use
-corepack enable
+nvm install
+npm install -g pnpm
 pnpm install
 ```
+
+`nvm install` reads `.nvmrc`, so it installs and selects the pinned Node. Any recent pnpm will do:
+`managePackageManagerVersions` is set, so pnpm reads the `packageManager` field and switches itself
+to the pinned version rather than running whatever you happen to have.
 
 `pnpm install` refuses to run on a Node version below the `engines` floor, and installs the
 pre-commit hook for you. No further setup step is needed.

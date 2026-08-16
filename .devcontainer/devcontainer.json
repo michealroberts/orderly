@@ -11,10 +11,9 @@
   // since TypeScript is a dev dependency here.
   "image": "mcr.microsoft.com/devcontainers/javascript-node:26-trixie",
   // pnpm is already present: the published image bakes in the devcontainers
-  // node feature, which installs pnpm by default. corepack is deliberately not
-  // used here, as Node 26 no longer bundles it and this image does not add it.
-  // The install also puts the lefthook pre-commit hook in place, so a fresh
-  // container is ready to commit without a further step.
+  // node feature, which installs pnpm by default. The install also puts the
+  // lefthook pre-commit hook in place, so a fresh container is ready to commit
+  // without a further step.
   "postCreateCommand": "pnpm install",
   "customizations": {
     "vscode": {
