@@ -57,7 +57,7 @@
     "@changesets/changelog-github": "1.0.0",
     "@changesets/cli": "3.0.0",
     "@cloudflare/vitest-pool-workers": "0.21.3",
-    "@cloudflare/workers-types": "5.20260801.1",
+    "@cloudflare/workers-types": "5.20260811.1",
     "lefthook": "2.1.10",
     "oxfmt": "0.63.0",
     "oxlint": "1.78.0",
