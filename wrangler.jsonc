@@ -6,6 +6,29 @@
   // Matches the workerd build pinned by the pool, so the runtime under test
   // and the compatibility surface it exposes cannot drift apart.
   "compatibility_date": "2026-08-11",
+  // Durable Objects have to be exported from a real module for the runtime to
+  // instantiate them. This points at a test fixture rather than src, because
+  // the class below is scaffolding for the harness and is not part of the
+  // published package. It moves into src once orderly owns a real run object.
+  "main": "tests/fixtures/worker.ts",
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "RUN",
+        "class_name": "Run",
+      },
+    ],
+  },
+  // Declarative class lifecycle. This replaces the older migrations array, and
+  // the two are mutually exclusive: a configuration carrying both is rejected
+  // outright. Since orderly has no Durable Objects in production yet, there is
+  // no legacy chain to carry and the map can start clean.
+  "exports": {
+    "Run": {
+      "type": "durable-object",
+      "storage": "sqlite",
+    },
+  },
   // A producer and a consumer over the same queue, so tests can exercise both
   // ends of the middleware: sending a message, and receiving it as a batch.
   // The values mirror a realistic consumer rather than the defaults, so that
