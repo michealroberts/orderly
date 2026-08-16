@@ -10,6 +10,11 @@ saveExact: true
 # Refuse to install on a Node version outside the `engines` range in package.json.
 engineStrict: true
 
+# Switch pnpm to the version named in the packageManager field rather than
+# running whatever the contributor happens to have installed, so any recent pnpm
+# on a host machine still resolves to the pinned version.
+managePackageManagerVersions: true
+
 # pnpm blocks dependency install scripts by default. Every entry below fetches
 # a platform binary the tool cannot run without, rather than performing optional
 # setup: workerd is the runtime the tests execute inside, esbuild is what
