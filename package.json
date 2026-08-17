@@ -45,7 +45,7 @@
     "format:check": "oxfmt --check",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "lint:package": "publint && attw --pack . --ignore-rules cjs-resolves-to-esm",
+    "lint:package": "node scripts/guard-dependencies.mjs && publint && attw --pack . --ignore-rules cjs-resolves-to-esm",
     "lint:types": "oxlint --type-aware",
     "prepack": "pnpm build",
     "test": "vitest run",
