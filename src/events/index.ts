@@ -10,4 +10,8 @@ export type { Event } from './envelope';
 
 export type { Outcome } from './outcome';
 
+export { statusOf } from './status';
+
+export type { Status } from './status';
+
 /*****************************************************************************************************************/
