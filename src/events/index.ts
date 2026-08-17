@@ -1,11 +1,11 @@
 /*****************************************************************************************************************/
 
 // @author         Michael Roberts <michael@observerly.com>
-// @package        @observerly/orderly
+// @package        @observerly/orderly/events
 // @license        Copyright © 2026 observerly
 
 /*****************************************************************************************************************/
 
-export type { Outcome } from './events/index';
+export type { Outcome } from './outcome';
 
 /*****************************************************************************************************************/
