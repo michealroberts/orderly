@@ -10,8 +10,8 @@ export { statusOf } from './events/index';
 
 export type { Event, Outcome, Status } from './events/index';
 
-export { MAXIMUM_DELAY_SECONDS } from './retry/index';
+export { MAXIMUM_DELAY_SECONDS, withExponentialRetryBackoff } from './retry/index';
 
-export type { RetryDecision, RetryPolicy } from './retry/index';
+export type { ExponentialRetryBackoffOptions, RetryDecision, RetryPolicy } from './retry/index';
 
 /*****************************************************************************************************************/
