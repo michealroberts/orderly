@@ -10,4 +10,8 @@ export { MAXIMUM_DELAY_SECONDS } from './decision';
 
 export type { RetryDecision, RetryPolicy } from './decision';
 
+export { withExponentialRetryBackoff } from './backoff';
+
+export type { ExponentialRetryBackoffOptions } from './backoff';
+
 /*****************************************************************************************************************/
