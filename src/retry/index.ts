@@ -1,17 +1,13 @@
 /*****************************************************************************************************************/
 
 // @author         Michael Roberts <michael@observerly.com>
-// @package        @observerly/orderly
+// @package        @observerly/orderly/retry
 // @license        Copyright © 2026 observerly
 
 /*****************************************************************************************************************/
 
-export { statusOf } from './events/index';
+export { MAXIMUM_DELAY_SECONDS } from './decision';
 
-export type { Event, Outcome, Status } from './events/index';
-
-export { MAXIMUM_DELAY_SECONDS } from './retry/index';
-
-export type { RetryDecision, RetryPolicy } from './retry/index';
+export type { RetryDecision, RetryPolicy } from './decision';
 
 /*****************************************************************************************************************/
