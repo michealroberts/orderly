@@ -14,4 +14,8 @@ export { withExponentialRetryBackoff } from './backoff';
 
 export type { ExponentialRetryBackoffOptions } from './backoff';
 
+export { withFixedRetryBackoff } from './fixed';
+
+export type { FixedRetryBackoffOptions } from './fixed';
+
 /*****************************************************************************************************************/
