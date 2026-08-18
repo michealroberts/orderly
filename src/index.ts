@@ -14,11 +14,13 @@ export {
   MAXIMUM_DELAY_SECONDS,
   withExponentialRetryBackoff,
   withFixedRetryBackoff,
+  withImmediateRetry,
 } from './retry/index';
 
 export type {
   ExponentialRetryBackoffOptions,
   FixedRetryBackoffOptions,
+  ImmediateRetryOptions,
   RetryDecision,
   RetryPolicy,
 } from './retry/index';

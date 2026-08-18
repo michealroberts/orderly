@@ -18,4 +18,8 @@ export { withFixedRetryBackoff } from './fixed';
 
 export type { FixedRetryBackoffOptions } from './fixed';
 
+export { withImmediateRetry } from './immediate';
+
+export type { ImmediateRetryOptions } from './immediate';
+
 /*****************************************************************************************************************/
