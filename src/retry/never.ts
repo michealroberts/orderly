@@ -6,22 +6,16 @@
 
 /*****************************************************************************************************************/
 
-export { MAXIMUM_DELAY_SECONDS } from './decision';
+import type { RetryPolicy } from './decision';
 
-export type { RetryDecision, RetryPolicy } from './decision';
+/*****************************************************************************************************************/
 
-export { withExponentialRetryBackoff } from './backoff';
-
-export type { ExponentialRetryBackoffOptions } from './backoff';
-
-export { withFixedRetryBackoff } from './fixed';
-
-export type { FixedRetryBackoffOptions } from './fixed';
-
-export { withImmediateRetry } from './immediate';
-
-export type { ImmediateRetryOptions } from './immediate';
-
-export { withoutRetry } from './never';
+// No retries at all: any throw discards the message deliberately. For handlers whose work is not safe or not
+// worth repeating, such as sending an email.
+export const withoutRetry = (): RetryPolicy => {
+  return () => {
+    return { action: 'discard', reason: 'retries are disabled' };
+  };
+};
 
 /*****************************************************************************************************************/
