@@ -15,6 +15,7 @@ export {
   withExponentialRetryBackoff,
   withFixedRetryBackoff,
   withImmediateRetry,
+  withoutRetry,
 } from './retry/index';
 
 export type {
