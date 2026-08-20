@@ -15,9 +15,11 @@ import process from 'node:process';
 // orderly ships with zero runtime dependencies, and that is a guarantee rather than a habit. This guard makes the
 // guarantee structural: the moment a dependencies key appears in the manifest, the package checks fail, in CI and
 // locally alike. devDependencies remain allowed, as they are toolchain-only and never ship.
-const manifest = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+const manifest: unknown = JSON.parse(
+  readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+);
 
-if ('dependencies' in manifest) {
+if (typeof manifest === 'object' && manifest !== null && 'dependencies' in manifest) {
   console.error(
     'package.json declares a dependencies key: @observerly/orderly ships with zero runtime dependencies.',
   );
