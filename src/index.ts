@@ -6,6 +6,8 @@
 
 /*****************************************************************************************************************/
 
+export type { MessageContext } from './consumer/index';
+
 export { statusOf } from './events/index';
 
 export type { Event, Outcome, Status } from './events/index';
