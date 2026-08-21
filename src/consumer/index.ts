@@ -6,6 +6,10 @@
 
 /*****************************************************************************************************************/
 
+export { createConsumer } from './create';
+
+export type { CreateConsumerOptions } from './create';
+
 export type { MessageContext } from './context';
 
 export { settle } from './settle';
