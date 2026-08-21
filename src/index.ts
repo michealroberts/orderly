@@ -12,6 +12,8 @@ export { statusOf } from './events/index';
 
 export type { Event, Outcome, Status } from './events/index';
 
+export { compose } from './middleware/index';
+
 export type { Middleware } from './middleware/index';
 
 export {
