@@ -6,7 +6,7 @@
 
 /*****************************************************************************************************************/
 
-export { settle } from './consumer/index';
+export { applyOutcome, settle } from './consumer/index';
 
 export type { HandlerResult, MessageContext, SettleOptions, Settlement } from './consumer/index';
 
