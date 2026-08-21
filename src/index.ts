@@ -6,7 +6,9 @@
 
 /*****************************************************************************************************************/
 
-export type { MessageContext } from './consumer/index';
+export { settle } from './consumer/index';
+
+export type { HandlerResult, MessageContext, SettleOptions, Settlement } from './consumer/index';
 
 export { statusOf } from './events/index';
 

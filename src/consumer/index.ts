@@ -8,4 +8,8 @@
 
 export type { MessageContext } from './context';
 
+export { settle } from './settle';
+
+export type { HandlerResult, SettleOptions, Settlement } from './settle';
+
 /*****************************************************************************************************************/
