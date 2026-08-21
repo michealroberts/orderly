@@ -12,6 +12,8 @@ import { compose, type Middleware } from '../middleware/index';
 
 import type { RetryPolicy } from '../retry/index';
 
+import { forEachConcurrently } from './concurrency';
+
 import type { MessageContext } from './context';
 
 import { type HandlerResult, settle, type Settlement } from './settle';
@@ -38,6 +40,9 @@ export interface CreateConsumerOptions<Body> {
   }) => unknown;
   // Called for every event emitted. A sink that throws is contained and never affects settlement.
   onEvent?: (event: Event) => unknown;
+  // How many messages settle at once. Absent means the whole batch together; 1 means one at a time in batch
+  // order. Floored, never below 1, and a value that is not finite means the whole batch.
+  concurrency?: number;
 }
 
 /*****************************************************************************************************************/
@@ -196,7 +201,7 @@ const announceBatch = <Body>(
 // rejected queue handler makes the platform retry the whole batch, acknowledged messages included, which is the
 // failure mode this module exists to remove.
 export const createConsumer = <Body = unknown>(options: CreateConsumerOptions<Body>) => {
-  const { handle, retry, use = [], onBatch, onEvent } = options;
+  const { handle, retry, use = [], onBatch, onEvent, concurrency } = options;
 
   const chain = compose<Body>(use);
 
@@ -222,12 +227,10 @@ export const createConsumer = <Body = unknown>(options: CreateConsumerOptions<Bo
       signal: controller.signal,
     };
 
-    await Promise.all(
-      batch.messages.map(message =>
-        settleMessage(message, tools).catch(() => {
-          // The transport itself refused; the platform treats an unsettled message as a retry.
-        }),
-      ),
+    await forEachConcurrently(batch.messages, concurrency ?? batch.messages.length, message =>
+      settleMessage(message, tools).catch(() => {
+        // The transport itself refused; the platform treats an unsettled message as a retry.
+      }),
     );
   };
 };
