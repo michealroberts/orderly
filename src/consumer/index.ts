@@ -12,4 +12,6 @@ export { settle } from './settle';
 
 export type { HandlerResult, SettleOptions, Settlement } from './settle';
 
+export { applyOutcome } from './transport';
+
 /*****************************************************************************************************************/
