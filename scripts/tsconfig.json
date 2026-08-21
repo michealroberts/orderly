@@ -1,0 +1,9 @@
+{
+  // The toolchain scripts run under Node rather than workerd, so this project swaps the workers types for
+  // Node's own. Node executes these files directly through type stripping, which is why nothing here emits.
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["./**/*.ts"]
+}

@@ -45,12 +45,12 @@
     "format:check": "oxfmt --check",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
-    "lint:package": "node scripts/guard-dependencies.mjs && publint && attw --pack . --ignore-rules cjs-resolves-to-esm",
+    "lint:package": "node scripts/guard-dependencies.ts && publint && attw --pack . --ignore-rules cjs-resolves-to-esm",
     "lint:types": "oxlint --type-aware",
     "prepack": "pnpm build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p tests/tsconfig.json"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tests/tsconfig.json && tsc --noEmit -p scripts/tsconfig.json"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "0.18.5",
@@ -58,6 +58,7 @@
     "@changesets/cli": "3.0.0",
     "@cloudflare/vitest-pool-workers": "0.21.3",
     "@cloudflare/workers-types": "5.20260811.1",
+    "@types/node": "24.13.3",
     "lefthook": "2.1.10",
     "oxfmt": "0.63.0",
     "oxlint": "1.78.0",
