@@ -63,11 +63,11 @@ export const settle = (result: HandlerResult, options: SettleOptions): Settlemen
   const { id, attempts, retry, startedAt, settledAt } = options;
 
   if (!result.threw) {
-    const durationMs = Math.max(settledAt - startedAt, 0);
+    const durationInMilliseconds = Math.max(settledAt - startedAt, 0);
 
     return {
       outcome: { type: 'succeeded' },
-      events: [{ type: 'message.succeeded', id, durationMs, at: settledAt }],
+      events: [{ type: 'message.succeeded', id, durationInMilliseconds, at: settledAt }],
     };
   }
 
