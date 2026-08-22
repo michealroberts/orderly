@@ -24,6 +24,13 @@ export { compose } from './middleware/index';
 
 export type { Middleware } from './middleware/index';
 
+export type {
+  StandardSchema,
+  StandardSchemaIssue,
+  StandardSchemaProperties,
+  StandardSchemaResult,
+} from './schema/index';
+
 export {
   MAXIMUM_DELAY_SECONDS,
   withExponentialRetryBackoff,
