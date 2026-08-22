@@ -6,6 +6,10 @@
 
 /*****************************************************************************************************************/
 
+export { defineQueue } from './contract';
+
+export type { DefineQueueOptions, QueueContract } from './contract';
+
 export { createProducer } from './producer';
 
 export type { CreateProducerOptions, Producer } from './producer';
