@@ -1,10 +1,10 @@
 # Releasing
 
-orderly is released with [changesets](https://github.com/changesets/changesets). Versions and
-changelog entries come from changesets committed alongside the changes that need them, rather than
-from commit subjects read back at release time.
+orderly is versioned with [changesets](https://github.com/changesets/changesets) and released by
+pushing a git tag. Versions and changelog entries come from changesets committed alongside the
+changes that need them, rather than from commit subjects read back at release time.
 
-Nothing is published by hand. Merging to `main` is what starts a release.
+Merging to `main` never versions and never publishes. Pushing a `v` tag is what releases.
 
 ## Adding A Changeset
 
@@ -36,28 +36,42 @@ pnpm exec changeset status
 
 ## How A Release Happens
 
-Every push to `main` runs [`.github/workflows/release.yml`](.github/workflows/release.yml), which
-behaves differently depending on whether changesets are pending.
+A release is three deliberate steps, all yours:
 
-1. **Changesets pending.** The workflow opens, or updates, a pull request titled
-   `chore: version packages`. That pull request applies the version bumps, writes `CHANGELOG.md`,
-   and deletes the changeset files it consumed. It is not published yet, and it will keep updating
-   itself as further changesets land on `main`.
+1. **Version.** On an up-to-date `main`, apply every pending changeset:
 
-2. **Review and merge that pull request** when the accumulated changes are ready to ship. This is
-   the point at which a release is decided; everything either side of it is automatic.
+   ```sh
+   pnpm changeset:version
+   ```
 
-3. **No changesets pending.** The same workflow runs again on that merge, finds nothing left to
-   version, and publishes instead.
+   This collapses the accumulated changesets into one bump, writes `CHANGELOG.md`, updates
+   `package.json`, and deletes the changeset files it consumed. Review what it produced, then land
+   it through a pull request like any other change:
 
-To hold a release back, leave the version pull request unmerged. Changesets accumulate into it
-harmlessly.
+   ```sh
+   git checkout -b chore/release/v0.1.0
+   git commit --all --message "chore: version the package for v0.1.0"
+   ```
+
+2. **Tag.** Once the version pull request is merged, tag that commit on `main` with the version it
+   set, `v` prefixed:
+
+   ```sh
+   git checkout main && git pull
+   git tag v0.1.0
+   git push origin v0.1.0
+   ```
+
+3. **The tag publishes.** Pushing the tag runs
+   [`.github/workflows/release.yml`](.github/workflows/release.yml), which builds and publishes to
+   npm over OIDC. Nothing else triggers it: no bot pull requests, no publishing on merge.
+
+To hold a release back, do nothing. Changesets accumulate on `main` harmlessly until you choose to
+version and tag.
 
 ## What Publishing Produces
 
 - `@observerly/orderly` on npm, at public access, with `dist/` only.
-- A git tag in the form `v0.1.0`. The `v` prefix depends on this repository having no `packages` key
-  in `pnpm-workspace.yaml`; declaring a workspace would tag `@observerly/orderly@0.1.0` instead.
 - A provenance attestation linking the published tarball to the commit and workflow run that built
   it. This is automatic on the trusted publishing path and needs no flag.
 
@@ -101,5 +115,8 @@ After that, step 2 never repeats and every later release goes through the workfl
   `id-token: write` permission.
 - **Published without `dist/`.** The build did not run. `prepack` covers this for a manual publish,
   and the workflow builds before publishing; a failure here means one of those was bypassed.
-- **No release happened at all.** Most likely no changeset was ever added, so there was nothing to
-  version. `pnpm exec changeset status` will say so.
+- **The tag ran no workflow.** The workflow triggers on tags matching `v*`; a tag named without the
+  prefix, or pushed to a fork, runs nothing.
+- **Wrong version published.** The tag names the release but the version comes from
+  `package.json`. If the two disagree, the versioning step was skipped or not merged before
+  tagging.
