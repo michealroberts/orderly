@@ -20,6 +20,8 @@ import { type HandlerResult, settle, type Settlement } from './settle';
 
 import { applyOutcome } from './transport';
 
+import { type BodySchema, type RejectionDecider, resolveBody } from './validation';
+
 /*****************************************************************************************************************/
 
 export interface CreateConsumerOptions<Body> {
@@ -43,6 +45,12 @@ export interface CreateConsumerOptions<Body> {
   // How many messages settle at once. Absent means the whole batch together; 1 means one at a time in batch
   // order. Floored, never below 1, and a value that is not finite means the whole batch.
   concurrency?: number;
+  // Validates the raw body before anything runs. A body that fails never reaches the middleware or the
+  // handler: the message settles as rejected.
+  schema?: BodySchema<Body>;
+  // What to do about a rejection. Absent means acknowledge it as rejected; a discard or retry decision
+  // converts it, with retry delays clamped to the platform bounds. Contained if it throws.
+  onRejected?: RejectionDecider;
 }
 
 /*****************************************************************************************************************/
@@ -52,8 +60,10 @@ interface Tools<Body> {
   chain: Middleware<Body>;
   emit: (event: Event) => void;
   handle: (message: Body, context: MessageContext) => unknown;
+  onRejected: RejectionDecider | undefined;
   queue: string;
   retry: RetryPolicy;
+  schema: BodySchema<Body> | undefined;
   signal: AbortSignal;
 }
 
@@ -112,7 +122,7 @@ const emitSettlement = (
 
 /*****************************************************************************************************************/
 
-const settleMessage = async <Body>(message: Message<Body>, tools: Tools<Body>): Promise<void> => {
+const settleMessage = async <Body>(message: Message, tools: Tools<Body>): Promise<void> => {
   const { chain, emit, handle, queue, retry, signal } = tools;
 
   const startedAt = Date.now();
@@ -123,13 +133,17 @@ const settleMessage = async <Body>(message: Message<Body>, tools: Tools<Body>): 
 
   emit({ type: 'message.started', id, attempts, at: startedAt });
 
+  const resolution = await resolveBody(message, tools.schema, context, emit, tools.onRejected);
+
+  if (!resolution.proceed) return;
+
   let settlement: Settlement | null = null;
 
   const terminal = async (): Promise<Outcome> => {
     let result: HandlerResult;
 
     try {
-      await handle(message.body, context);
+      await handle(resolution.body, context);
 
       result = { threw: false };
     } catch (error) {
@@ -144,7 +158,7 @@ const settleMessage = async <Body>(message: Message<Body>, tools: Tools<Body>): 
   let outcome: Outcome;
 
   try {
-    outcome = await chain(message.body, context, terminal);
+    outcome = await chain(resolution.body, context, terminal);
   } catch (error) {
     // A middleware that throws, or calls next() twice, settles the message through the retry policy rather
     // than crashing the batch.
@@ -201,11 +215,12 @@ const announceBatch = <Body>(
 // rejected queue handler makes the platform retry the whole batch, acknowledged messages included, which is the
 // failure mode this module exists to remove.
 export const createConsumer = <Body = unknown>(options: CreateConsumerOptions<Body>) => {
-  const { handle, retry, use = [], onBatch, onEvent, concurrency } = options;
+  const { handle, retry, use = [], onBatch, onEvent, concurrency, schema, onRejected } = options;
 
   const chain = compose<Body>(use);
 
-  return async (batch: MessageBatch<Body>): Promise<void> => {
+  // The wire truth: bodies are whatever was sent, and only the schema, when configured, turns them into Body.
+  return async (batch: MessageBatch): Promise<void> => {
     const emit = (event: Event): void => {
       try {
         onEvent?.(event);
@@ -220,6 +235,8 @@ export const createConsumer = <Body = unknown>(options: CreateConsumerOptions<Bo
 
     const tools: Tools<Body> = {
       chain,
+      onRejected,
+      schema,
       emit,
       handle,
       queue: batch.queue,

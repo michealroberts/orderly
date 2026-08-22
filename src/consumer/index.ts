@@ -18,4 +18,6 @@ export type { HandlerResult, SettleOptions, Settlement } from './settle';
 
 export { applyOutcome } from './transport';
 
+export type { BodySchema } from './validation';
+
 /*****************************************************************************************************************/
