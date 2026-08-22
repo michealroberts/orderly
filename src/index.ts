@@ -6,9 +6,15 @@
 
 /*****************************************************************************************************************/
 
-export { applyOutcome, settle } from './consumer/index';
+export { applyOutcome, createConsumer, settle } from './consumer/index';
 
-export type { HandlerResult, MessageContext, SettleOptions, Settlement } from './consumer/index';
+export type {
+  CreateConsumerOptions,
+  HandlerResult,
+  MessageContext,
+  SettleOptions,
+  Settlement,
+} from './consumer/index';
 
 export { statusOf } from './events/index';
 
