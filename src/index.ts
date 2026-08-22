@@ -9,6 +9,7 @@
 export { applyOutcome, createConsumer, settle } from './consumer/index';
 
 export type {
+  BodySchema,
   CreateConsumerOptions,
   HandlerResult,
   MessageContext,
