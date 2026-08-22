@@ -33,7 +33,7 @@ describe('envelope', () => {
       type: 'batch.received';
       queue: string;
       size: number;
-      lagMs: number;
+      lagInMilliseconds: number;
       at: number;
     }>();
 
@@ -53,7 +53,7 @@ describe('envelope terminal events', () => {
     expectTypeOf<Extract<Event, { type: 'message.succeeded' }>>().toEqualTypeOf<{
       type: 'message.succeeded';
       id: string;
-      durationMs: number;
+      durationInMilliseconds: number;
       at: number;
     }>();
 

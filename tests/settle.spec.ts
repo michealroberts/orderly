@@ -30,7 +30,7 @@ describe('settle on success', () => {
   it('acknowledges with a single succeeded event carrying the duration', () => {
     expect(settle({ threw: false }, { ...base, retry: withoutRetry() })).toStrictEqual({
       outcome: { type: 'succeeded' },
-      events: [{ type: 'message.succeeded', id: 'm1', durationMs: 250, at: 1_250 }],
+      events: [{ type: 'message.succeeded', id: 'm1', durationInMilliseconds: 250, at: 1_250 }],
     });
   });
 
@@ -41,7 +41,7 @@ describe('settle on success', () => {
     );
 
     expect(settlement.events).toStrictEqual([
-      { type: 'message.succeeded', id: 'm1', durationMs: 0, at: 1_000 },
+      { type: 'message.succeeded', id: 'm1', durationInMilliseconds: 0, at: 1_000 },
     ]);
   });
 });

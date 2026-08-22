@@ -36,7 +36,7 @@ export interface CreateConsumerOptions<Body> {
   onBatch?: (facts: {
     queue: string;
     size: number;
-    lagMs: number;
+    lagInMilliseconds: number;
     backlogCount: number;
     backlogBytes: number;
   }) => unknown;
@@ -73,7 +73,12 @@ interface Tools<Body> {
 const decisionEvent = (outcome: Outcome, id: string, startedAt: number, at: number): Event => {
   switch (outcome.type) {
     case 'succeeded': {
-      return { type: 'message.succeeded', id, durationMs: Math.max(at - startedAt, 0), at };
+      return {
+        type: 'message.succeeded',
+        id,
+        durationInMilliseconds: Math.max(at - startedAt, 0),
+        at,
+      };
     }
     case 'retried': {
       return { type: 'message.retried', id, delaySeconds: outcome.delaySeconds, at };
@@ -189,11 +194,11 @@ const announceBatch = <Body>(
     receivedAt,
   );
 
-  const lagMs = Math.max(receivedAt - oldest, 0);
+  const lagInMilliseconds = Math.max(receivedAt - oldest, 0);
 
   const size = batch.messages.length;
 
-  emit({ type: 'batch.received', queue: batch.queue, size, lagMs, at: receivedAt });
+  emit({ type: 'batch.received', queue: batch.queue, size, lagInMilliseconds, at: receivedAt });
 
   if (onBatch === undefined) {
     return;
@@ -202,7 +207,7 @@ const announceBatch = <Body>(
   try {
     const { backlogCount, backlogBytes } = batch.metadata.metrics;
 
-    onBatch({ queue: batch.queue, size, lagMs, backlogCount, backlogBytes });
+    onBatch({ queue: batch.queue, size, lagInMilliseconds, backlogCount, backlogBytes });
   } catch {
     // A throwing observer must never affect settlement.
   }

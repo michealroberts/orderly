@@ -16,7 +16,7 @@ const received = (at: number): Event => ({
   type: 'batch.received',
   queue: 'orderly',
   size: 1,
-  lagMs: 0,
+  lagInMilliseconds: 0,
   at,
 });
 
@@ -30,7 +30,7 @@ const started = (id: string, at: number): Event => ({
 const succeeded = (id: string, at: number): Event => ({
   type: 'message.succeeded',
   id,
-  durationMs: 1,
+  durationInMilliseconds: 1,
   at,
 });
 
