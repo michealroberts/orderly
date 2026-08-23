@@ -8,4 +8,8 @@
 
 export type { Schedule } from './contract';
 
+export { at } from './once';
+
+export type { Anchor } from './once';
+
 /*****************************************************************************************************************/
