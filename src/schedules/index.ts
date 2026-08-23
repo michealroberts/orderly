@@ -8,6 +8,10 @@
 
 export type { Schedule } from './contract';
 
+export { durationInMilliseconds } from './duration';
+
+export type { Duration } from './duration';
+
 export { at } from './once';
 
 export type { Anchor } from './once';
