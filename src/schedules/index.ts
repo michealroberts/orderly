@@ -12,4 +12,8 @@ export { at } from './once';
 
 export type { Anchor } from './once';
 
+export { preview } from './preview';
+
+export type { PreviewOptions } from './preview';
+
 /*****************************************************************************************************************/
