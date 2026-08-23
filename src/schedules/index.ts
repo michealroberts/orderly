@@ -6,6 +6,8 @@
 
 /*****************************************************************************************************************/
 
+export { add, subtract } from './arithmetic';
+
 export type { Schedule } from './contract';
 
 export { durationInMilliseconds } from './duration';
