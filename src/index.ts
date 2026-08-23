@@ -25,6 +25,8 @@ export { compose } from './middleware/index';
 
 export type { Middleware } from './middleware/index';
 
+export type { Schedule } from './schedules/index';
+
 export { createProducer, defineQueue } from './queues/index';
 
 export type {
