@@ -25,9 +25,9 @@ export { compose } from './middleware/index';
 
 export type { Middleware } from './middleware/index';
 
-export { add, at, durationInMilliseconds, preview, subtract } from './schedules/index';
+export { add, at, durationInMilliseconds, every, preview, subtract } from './schedules/index';
 
-export type { Anchor, Duration, PreviewOptions, Schedule } from './schedules/index';
+export type { Anchor, Duration, Interval, PreviewOptions, Schedule } from './schedules/index';
 
 export { createProducer, defineQueue } from './queues/index';
 
