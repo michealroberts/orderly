@@ -60,6 +60,28 @@ export type WallClock = {
 
 /*****************************************************************************************************************/
 
+// The hour and minute of a wall clock reading, the moment in a day a calendar occurrence lands on.
+export type WallTime = {
+  // The hour of the day, a whole number from 0 through 23 on a twenty four hour clock.
+  hour: number;
+  // The minute of the hour, a whole number from 0 through 59.
+  minute: number;
+};
+
+/*****************************************************************************************************************/
+
+// A day of the week by its full name, Monday first, matching the weekday numbering of WallClock.
+export type Weekday =
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday'
+  | 'sunday';
+
+/*****************************************************************************************************************/
+
 export const wallClockOf = (instant: Date, timezone: string): WallClock => {
   const parts = new Map(
     formatterFor(timezone)

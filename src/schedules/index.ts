@@ -8,6 +8,8 @@
 
 export { add, subtract } from './arithmetic';
 
+export type { CalendarDayOptions, CalendarMonthOptions, CalendarWeekOptions } from './calendar';
+
 export type { Schedule } from './contract';
 
 export { durationInMilliseconds } from './duration';
@@ -25,5 +27,7 @@ export type { Anchor } from './once';
 export { preview } from './preview';
 
 export type { PreviewOptions } from './preview';
+
+export type { WallTime, Weekday } from './timezone';
 
 /*****************************************************************************************************************/

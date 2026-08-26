@@ -6,6 +6,10 @@
 
 /*****************************************************************************************************************/
 
+import { calendarDays, calendarMonths, calendarWeeks } from './calendar';
+
+import type { CalendarDayOptions, CalendarMonthOptions, CalendarWeekOptions } from './calendar';
+
 import {
   MAXIMUM_INSTANT_IN_MILLISECONDS,
   MILLISECONDS_IN_HOUR,
@@ -33,6 +37,14 @@ export interface Interval {
   // Occurrences every count hours, aligned to the epoch: every(6).hours() ticks at 00:00, 06:00, 12:00 and
   // 18:00 UTC.
   hours: () => Schedule;
+  // Occurrences every count days on a timezone's calendar at a wall clock time; midnight UTC when unspecified.
+  days: (options?: CalendarDayOptions) => Schedule;
+  // Occurrences every count weeks on a weekday of a timezone's calendar; Mondays at midnight UTC when
+  // unspecified.
+  weeks: (options?: CalendarWeekOptions) => Schedule;
+  // Occurrences every count months on a day of a timezone's calendar, skipping months without it; the first
+  // at midnight UTC when unspecified.
+  months: (options?: CalendarMonthOptions) => Schedule;
 }
 
 /*****************************************************************************************************************/
@@ -80,6 +92,9 @@ export const every = (count: number): Interval => {
   return {
     minutes: () => aligned(count * MILLISECONDS_IN_MINUTE),
     hours: () => aligned(count * MILLISECONDS_IN_HOUR),
+    days: options => calendarDays(count, options),
+    weeks: options => calendarWeeks(count, options),
+    months: options => calendarMonths(count, options),
   };
 };
 
