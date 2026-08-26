@@ -14,6 +14,10 @@ export { durationInMilliseconds } from './duration';
 
 export type { Duration } from './duration';
 
+export { every } from './interval';
+
+export type { Interval } from './interval';
+
 export { at } from './once';
 
 export type { Anchor } from './once';
