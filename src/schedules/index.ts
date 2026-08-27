@@ -12,6 +12,10 @@ export type { CalendarDayOptions, CalendarMonthOptions, CalendarWeekOptions } fr
 
 export type { Schedule } from './contract';
 
+export { parseCron } from './crontab';
+
+export type { ParsedCron } from './crontab';
+
 export { durationInMilliseconds } from './duration';
 
 export type { Duration } from './duration';
