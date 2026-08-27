@@ -32,6 +32,7 @@ export {
   durationInMilliseconds,
   every,
   parseCron,
+  parseRecurrenceRule,
   preview,
   subtract,
 } from './schedules/index';
@@ -45,7 +46,10 @@ export type {
   Duration,
   Interval,
   ParsedCron,
+  ParsedRecurrenceRule,
   PreviewOptions,
+  RecurrenceFrequency,
+  RecurrenceWeekday,
   Schedule,
   WallTime,
   Weekday,

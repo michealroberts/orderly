@@ -36,6 +36,10 @@ export { preview } from './preview';
 
 export type { PreviewOptions } from './preview';
 
+export { parseRecurrenceRule } from './recurrence';
+
+export type { ParsedRecurrenceRule, RecurrenceFrequency, RecurrenceWeekday } from './recurrence';
+
 export type { WallTime, Weekday } from './timezone';
 
 /*****************************************************************************************************************/
