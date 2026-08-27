@@ -27,7 +27,18 @@ export type { Middleware } from './middleware/index';
 
 export { add, at, durationInMilliseconds, every, preview, subtract } from './schedules/index';
 
-export type { Anchor, Duration, Interval, PreviewOptions, Schedule } from './schedules/index';
+export type {
+  Anchor,
+  CalendarDayOptions,
+  CalendarMonthOptions,
+  CalendarWeekOptions,
+  Duration,
+  Interval,
+  PreviewOptions,
+  Schedule,
+  WallTime,
+  Weekday,
+} from './schedules/index';
 
 export { createProducer, defineQueue } from './queues/index';
 
