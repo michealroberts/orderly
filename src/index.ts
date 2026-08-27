@@ -25,7 +25,15 @@ export { compose } from './middleware/index';
 
 export type { Middleware } from './middleware/index';
 
-export { add, at, durationInMilliseconds, every, preview, subtract } from './schedules/index';
+export {
+  add,
+  at,
+  durationInMilliseconds,
+  every,
+  parseCron,
+  preview,
+  subtract,
+} from './schedules/index';
 
 export type {
   Anchor,
@@ -34,6 +42,7 @@ export type {
   CalendarWeekOptions,
   Duration,
   Interval,
+  ParsedCron,
   PreviewOptions,
   Schedule,
   WallTime,
