@@ -27,24 +27,25 @@ import type { WallTime } from './timezone';
 // cannot be resolved and is exhaustion instead. The horizon is met by the reading with its time of day
 // included: a later wall time exhausts up to a day of representable instants sooner, surrendered deliberately
 // at the end of the year 275760 rather than resolved by a separate edge strategy.
-const HORIZON_IN_MILLISECONDS = MAXIMUM_INSTANT_IN_MILLISECONDS - MILLISECONDS_IN_DAY;
+export const HORIZON_IN_MILLISECONDS = MAXIMUM_INSTANT_IN_MILLISECONDS - MILLISECONDS_IN_DAY;
 
 /*****************************************************************************************************************/
 
 // Remainders the Euclidean way, never negative, so indices before the epoch stay aligned to the same series.
-const modulo = (value: number, divisor: number): number => ((value % divisor) + divisor) % divisor;
+export const modulo = (value: number, divisor: number): number =>
+  ((value % divisor) + divisor) % divisor;
 
 /*****************************************************************************************************************/
 
-type WallDate = { year: number; month: number; day: number };
+export type WallDate = { year: number; month: number; day: number };
 
 // Days since 1970-01-01 on the calendar the wall date belongs to; exact, because every UTC day is a whole
 // number of milliseconds.
-const dayNumberOf = (wall: WallDate): number => {
+export const dayNumberOf = (wall: WallDate): number => {
   return Date.UTC(wall.year, wall.month - 1, wall.day) / MILLISECONDS_IN_DAY;
 };
 
-const wallDateOf = (dayNumber: number): WallDate => {
+export const wallDateOf = (dayNumber: number): WallDate => {
   const date = new Date(dayNumber * MILLISECONDS_IN_DAY);
 
   return { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1, day: date.getUTCDate() };
