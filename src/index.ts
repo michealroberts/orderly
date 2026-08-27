@@ -28,6 +28,7 @@ export type { Middleware } from './middleware/index';
 export {
   add,
   at,
+  cron,
   durationInMilliseconds,
   every,
   parseCron,
@@ -40,6 +41,7 @@ export type {
   CalendarDayOptions,
   CalendarMonthOptions,
   CalendarWeekOptions,
+  CronOptions,
   Duration,
   Interval,
   ParsedCron,
