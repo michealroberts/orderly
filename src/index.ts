@@ -34,6 +34,7 @@ export {
   parseCron,
   parseRecurrenceRule,
   preview,
+  recurrenceRule,
   subtract,
 } from './schedules/index';
 
@@ -49,6 +50,7 @@ export type {
   ParsedRecurrenceRule,
   PreviewOptions,
   RecurrenceFrequency,
+  RecurrenceRuleOptions,
   RecurrenceWeekday,
   Schedule,
   WallTime,

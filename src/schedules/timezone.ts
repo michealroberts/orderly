@@ -113,7 +113,7 @@ export const wallClockOf = (instant: Date, timezone: string): WallClock => {
 /*****************************************************************************************************************/
 
 // The zone's offset at an instant, derived by reading the wall clock there and treating it as if it were UTC.
-const offsetInMilliseconds = (instant: number, timezone: string): number => {
+export const offsetInMilliseconds = (instant: number, timezone: string): number => {
   const wall = wallClockOf(new Date(instant), timezone);
 
   return (

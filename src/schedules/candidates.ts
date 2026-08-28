@@ -51,9 +51,12 @@ export const wallDateOf = (dayNumber: number): WallDate => {
   return { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1, day: date.getUTCDate() };
 };
 
-const daysInMonth = (year: number, month: number): number => {
+export const daysInMonth = (year: number, month: number): number => {
   return new Date(Date.UTC(year, month, 0)).getUTCDate();
 };
+
+// The weekday a day number falls on, 1 through 7 with Monday first: day zero is 1970-01-01, a Thursday.
+export const weekdayOf = (dayNumber: number): number => modulo(dayNumber + 3, 7) + 1;
 
 /*****************************************************************************************************************/
 
