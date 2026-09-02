@@ -36,6 +36,7 @@ export {
   preview,
   recurrenceRule,
   subtract,
+  union,
 } from './schedules/index';
 
 export type {
