@@ -40,6 +40,7 @@ export {
 
 export type {
   Anchor,
+  AnchoredInterval,
   CalendarDayOptions,
   CalendarMonthOptions,
   CalendarWeekOptions,

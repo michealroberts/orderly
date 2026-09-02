@@ -8,6 +8,8 @@
 
 import type { Schedule } from './contract';
 
+import { anchoredEvery, type AnchoredInterval } from './anchored';
+
 /*****************************************************************************************************************/
 
 // An anchor is deliberately not a Schedule: at(date) alone is an unfinished sentence about how many runs it
@@ -15,6 +17,9 @@ import type { Schedule } from './contract';
 export interface Anchor {
   // Runs once, at exactly the anchored instant, to the millisecond, then exhausts.
   once: () => Schedule;
+  // Runs every count of a unit from the anchored instant, the anchor the first run, the unit still to be
+  // named: at(date).every(5).minutes() is the instant given and every five minutes after it.
+  every: (count: number) => AnchoredInterval;
 }
 
 /*****************************************************************************************************************/
@@ -31,9 +36,18 @@ export const at = (date: Date): Anchor => {
   return {
     once: () => {
       return {
-        next: after => (after.getTime() < instant ? new Date(instant) : null),
+        next: after => {
+          const reached = after.getTime();
+
+          if (Number.isNaN(reached)) {
+            throw new RangeError('at().once() requires a valid Date to advance from');
+          }
+
+          return reached < instant ? new Date(instant) : null;
+        },
       };
     },
+    every: count => anchoredEvery(instant, count),
   };
 };
 

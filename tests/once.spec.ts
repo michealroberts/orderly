@@ -37,6 +37,10 @@ describe('at().once()', () => {
     expect(() => at(new Date('not a date'))).toThrow('at() requires a valid Date');
   });
 
+  it('refuses to advance from an invalid Date rather than answering with exhaustion', () => {
+    expect(() => at(new Date(instant)).once().next(new Date(Number.NaN))).toThrow(RangeError);
+  });
+
   it('is an anchor, not a schedule: the sentence must be finished', () => {
     expectTypeOf<Anchor>().not.toHaveProperty('next');
 
