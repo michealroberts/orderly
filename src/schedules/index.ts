@@ -40,6 +40,10 @@ export { parseRecurrenceRule } from './recurrence';
 
 export type { ParsedRecurrenceRule, RecurrenceFrequency, RecurrenceWeekday } from './recurrence';
 
+export { recurrenceRule } from './recurrence-schedule';
+
+export type { RecurrenceRuleOptions } from './recurrence-schedule';
+
 export type { WallTime, Weekday } from './timezone';
 
 /*****************************************************************************************************************/

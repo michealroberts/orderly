@@ -9,9 +9,9 @@
 import {
   dayNumberOf,
   HORIZON_IN_MILLISECONDS,
-  modulo,
   type WallDate,
   wallDateOf,
+  weekdayOf,
 } from './candidates';
 
 import type { Schedule } from './contract';
@@ -36,11 +36,6 @@ export type CronOptions = {
   // triggers read them.
   timezone?: string;
 };
-
-/*****************************************************************************************************************/
-
-// Day numbering runs from 1970-01-01, a Thursday, which is 4 counting from Monday.
-const weekdayOf = (dayNumber: number): number => modulo(dayNumber + 3, 7) + 1;
 
 /*****************************************************************************************************************/
 
@@ -182,7 +177,7 @@ const constantOffsetOf = (
 // maps them to instants by arithmetic alone, which is the ordinary day and costs two readings of the zone
 // however many times the expression names; the occurrence is read back before it is returned, and anything
 // else, a transition day above all, falls to the exact reading.
-const nextOn = (
+export const nextOn = (
   dayNumber: number,
   minutesOfDay: number[],
   timezone: string,
