@@ -6,6 +6,8 @@
 
 /*****************************************************************************************************************/
 
+export type { AnchoredInterval } from './anchored';
+
 export { add, subtract } from './arithmetic';
 
 export type { CalendarDayOptions, CalendarMonthOptions, CalendarWeekOptions } from './calendar';

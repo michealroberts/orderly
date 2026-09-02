@@ -49,11 +49,11 @@ export interface Interval {
 
 /*****************************************************************************************************************/
 
-// A schedule ticking once per period from the epoch. The period is floored to whole milliseconds and must be
-// one a number counts exactly: past Number.MAX_SAFE_INTEGER, overflow to Infinity included, tick arithmetic
-// would drift, so exactness is enforced here rather than promised. A period that floors to nothing would never
-// advance. Both are refused loudly rather than becoming schedules that violate the contract.
-const aligned = (periodInMilliseconds: number): Schedule => {
+// A period floored to whole milliseconds, which must be one a number counts exactly: past Number.MAX_SAFE_INTEGER,
+// overflow to Infinity included, tick arithmetic would drift, so exactness is enforced here rather than
+// promised. A period that floors to nothing would never advance. Both are refused loudly rather than becoming
+// schedules that violate the contract. The anchored cadences read their periods through the same checks.
+export const validatedPeriod = (periodInMilliseconds: number): number => {
   const period = Math.floor(periodInMilliseconds);
 
   if (!Number.isSafeInteger(period)) {
@@ -63,6 +63,15 @@ const aligned = (periodInMilliseconds: number): Schedule => {
   if (period < 1) {
     throw new RangeError('an interval must span at least one whole millisecond');
   }
+
+  return period;
+};
+
+/*****************************************************************************************************************/
+
+// A schedule ticking once per period from the epoch.
+const aligned = (periodInMilliseconds: number): Schedule => {
+  const period = validatedPeriod(periodInMilliseconds);
 
   return {
     next: after => {
@@ -83,18 +92,27 @@ const aligned = (periodInMilliseconds: number): Schedule => {
 
 // The cadence: how many of a unit between occurrences. Counts may be fractional, half an hour being a legal way
 // to say thirty minutes, but zero, negative and non-finite counts are refused loudly here rather than becoming
-// a schedule that never advances.
-export const every = (count: number): Interval => {
+// a schedule that never advances. The anchored cadences read their counts through the same check.
+export const validatedCount = (count: number): number => {
   if (!Number.isFinite(count) || count <= 0) {
     throw new RangeError('every() requires a finite count greater than zero');
   }
 
+  return count;
+};
+
+/*****************************************************************************************************************/
+
+// The cadence counted from the epoch, its unit still to be named.
+export const every = (count: number): Interval => {
+  const cadence = validatedCount(count);
+
   return {
-    minutes: () => aligned(count * MILLISECONDS_IN_MINUTE),
-    hours: () => aligned(count * MILLISECONDS_IN_HOUR),
-    days: options => calendarDays(count, options),
-    weeks: options => calendarWeeks(count, options),
-    months: options => calendarMonths(count, options),
+    minutes: () => aligned(cadence * MILLISECONDS_IN_MINUTE),
+    hours: () => aligned(cadence * MILLISECONDS_IN_HOUR),
+    days: options => calendarDays(cadence, options),
+    weeks: options => calendarWeeks(cadence, options),
+    months: options => calendarMonths(cadence, options),
   };
 };
 
