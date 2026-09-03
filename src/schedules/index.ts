@@ -48,4 +48,6 @@ export type { RecurrenceRuleOptions } from './recurrence-schedule';
 
 export type { WallTime, Weekday } from './timezone';
 
+export { union } from './union';
+
 /*****************************************************************************************************************/
