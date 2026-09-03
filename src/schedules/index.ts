@@ -26,6 +26,8 @@ export { durationInMilliseconds } from './duration';
 
 export type { Duration } from './duration';
 
+export { exclude } from './exclude';
+
 export { every } from './interval';
 
 export type { Interval } from './interval';

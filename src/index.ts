@@ -31,6 +31,7 @@ export {
   cron,
   durationInMilliseconds,
   every,
+  exclude,
   parseCron,
   parseRecurrenceRule,
   preview,
