@@ -10,6 +10,10 @@ export type { AnchoredInterval } from './anchored';
 
 export { add, subtract } from './arithmetic';
 
+export { between } from './between';
+
+export type { BetweenOptions } from './between';
+
 export type { CalendarDayOptions, CalendarMonthOptions, CalendarWeekOptions } from './calendar';
 
 export type { Schedule } from './contract';

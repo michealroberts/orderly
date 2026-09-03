@@ -28,6 +28,7 @@ export type { Middleware } from './middleware/index';
 export {
   add,
   at,
+  between,
   cron,
   durationInMilliseconds,
   every,
@@ -43,6 +44,7 @@ export {
 export type {
   Anchor,
   AnchoredInterval,
+  BetweenOptions,
   CalendarDayOptions,
   CalendarMonthOptions,
   CalendarWeekOptions,
