@@ -206,6 +206,153 @@ statusOf(events); // 'pending' | 'running' | 'succeeded' | 'failed'
 The vocabulary is closed: `batch.received`, `message.started`, then a terminal mirror of the
 outcome for every message, with failures recorded as fact then decision.
 
+## Schedules
+
+A schedule is the vocabulary for when something should happen, and it reduces to one pure function:
+`next(after)` returns the first occurrence strictly after the instant given, or `null` once nothing
+will ever follow. Every constructor below produces one, every combinator takes and returns one, and
+because the same instant in always yields the same instant out, every worker on every replay
+computes the same series. The module depends on nothing but `Intl`.
+
+```ts
+import type { Schedule } from '@observerly/orderly';
+
+const hourly: Schedule = { next: after => new Date(after.getTime() + 3_600_000) };
+```
+
+### At A Glance
+
+| Schedule                                                                   | Description                                                                                                                                                   |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `at(date).once()`                                                          | Once, at exactly that instant, to the millisecond, then exhausted.                                                                                            |
+| `at(date).every(5).minutes()`                                              | That instant, then every five minutes after it.                                                                                                               |
+| `every(5).minutes()`                                                       | Every five minutes on the hour, five past and ten past, aligned to the Unix epoch rather than to when it was built, so every worker computes the same series. |
+| `every(6).hours()`                                                         | Every six hours: midnight, six, noon and six in the evening, UTC.                                                                                             |
+| `every(1).days({ at: { hour: 9, minute: 0 }, timezone: 'Europe/London' })` | Nine each morning in London, across daylight saving.                                                                                                          |
+| `every(2).weeks({ on: 'friday', at: { hour: 17, minute: 30 } })`           | Half past five every other Friday, UTC when no timezone is given.                                                                                             |
+| `every(1).months({ on: 31 })`                                              | The thirty first of each month that has one; the rest are skipped, never clamped.                                                                             |
+| `cron('0 9 * * 2-6', { timezone: 'Europe/London' })`                       | A crontab expression, five fields as Cloudflare reads them: weekdays at nine in London.                                                                       |
+| `recurrenceRule('FREQ=MONTHLY;BYDAY=2MO', { from })`                       | A calendar's recurrence rule: the second Monday of every month, counted from `from`.                                                                          |
+| `union([weekdays, weekends])`                                              | Several schedules as one: fires whenever any member does, and exhausts once every member has.                                                                 |
+| `exclude(mornings, christmas)`                                             | Every occurrence of the first, less those the second names exactly.                                                                                           |
+| `between(hourly, { from, until })`                                         | Only within the window: nothing before it opens or after it closes, both ends inclusive, either open.                                                         |
+| `preview(schedule, { after, take: 5 })`                                    | A dry run: the next five occurrences, as Dates.                                                                                                               |
+
+### Instants & Clock Cadences
+
+The grammar reads as sentences, and an unfinished one does not compile: `at(date)` and `every(5)`
+are not schedules until a verb finishes them.
+
+```ts
+import { at, every } from '@observerly/orderly';
+
+const date = new Date('2026-01-05T09:00:00Z');
+
+at(date).once(); // once, at exactly that instant, to the millisecond, then exhausted
+at(date).every(5).minutes(); // that instant and every five minutes after it
+at(date).every(1.5).hours(); // the clock units take fractional counts
+
+every(5).minutes(); // :00, :05 and :10, aligned to the Unix epoch, not to when this ran
+every(6).hours(); // 00:00, 06:00, 12:00 and 18:00 UTC
+```
+
+Alignment is the decision that keeps `next()` pure: `every(5).minutes()` ticks at the same instants
+for everyone, so two deploys of one schedule can never drift apart. A cadence counted from an
+instant of your choosing is `at(date).every(...)`, that instant being its first occurrence.
+
+### Calendar Units
+
+Days, weeks and months are calendar units rather than fixed spans, because a day is not always
+twenty four hours and months differ in length. They land on a timezone's own calendar at a wall
+clock time, UTC and midnight when neither is given:
+
+```ts
+import { every } from '@observerly/orderly';
+
+every(1).days({ at: { hour: 9, minute: 0 }, timezone: 'Europe/London' });
+every(2).weeks({ on: 'friday', at: { hour: 17, minute: 30 }, timezone: 'America/New_York' });
+every(1).months({ on: 31 }); // a month without a thirty first is skipped, never clamped
+```
+
+### Cron
+
+Cron is the five fields Cloudflare's own triggers read, with lists, ranges, steps, `JAN` through
+`DEC` and `SUN` through `SAT`, and the days of the week counted from Sunday as one. When both day
+fields are written, a day matches when either does, as classic cron has always read them:
+
+```ts
+import { cron, parseCron } from '@observerly/orderly';
+
+cron('0 9 * * 2-6', { timezone: 'Europe/London' }); // weekdays at nine, London time
+cron('30 2 1 * *'); // the first of every month at 02:30 UTC
+cron('0 0 13 * FRI'); // every thirteenth and every Friday, not only Friday the thirteenth
+
+parseCron('*/15 9-17 * * *'); // the fields expanded to the values they allow, as data
+```
+
+### Recurrence Rules
+
+Recurrence rules are the grammar of RFC 5545, the one calendars speak. `FREQ`, `INTERVAL`, `COUNT`,
+`UNTIL`, `BYMONTH`, `BYMONTHDAY`, `BYDAY`, `BYHOUR`, `BYMINUTE` and `WKST` are honoured, each part
+narrowing or expanding exactly as the specification's table has it for its frequency. `from` plays
+the role of `DTSTART`: the parts a rule leaves unwritten take their values from it, and it is the
+first occurrence.
+
+```ts
+import { parseRecurrenceRule, recurrenceRule } from '@observerly/orderly';
+
+const from = new Date('2026-01-05T09:00:00Z');
+
+recurrenceRule('FREQ=MONTHLY;BYDAY=2MO', { from, timezone: 'Europe/London' }); // second Mondays
+recurrenceRule('FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=29', { from }); // every leap day
+recurrenceRule('FREQ=WEEKLY;BYDAY=MO,WE,FR;COUNT=10', { from }); // ten, the anchor the first
+recurrenceRule('FREQ=DAILY;UNTIL=20261231T090000Z', { from }); // the end is inclusive
+
+parseRecurrenceRule('FREQ=HOURLY;INTERVAL=6'); // the parts expanded to what they name, as data
+```
+
+The parts not honoured, `BYSECOND`, `BYYEARDAY`, `BYWEEKNO` and `BYSETPOS`, are refused by name
+rather than ignored, because a rule quietly stripped of what narrows it fires far more often than
+it was asked to. Two choices are stricter than the specification: a counted weekday beside
+`BYMONTHDAY` is refused, and the frequencies below a day step in instants, so an hourly rule stays
+hourly across a daylight saving transition rather than repeating or skipping an hour of wall clock.
+
+### Combining Schedules
+
+```ts
+import { between, cron, every, exclude, union } from '@observerly/orderly';
+
+union([cron('0 9 * * 2-6'), cron('0 12 * * 1,7')]); // weekdays at nine and weekends at noon
+exclude(cron('0 9 * * *'), cron('0 9 25 12 *')); // every morning except Christmas morning
+between(every(1).hours(), { from: opens, until: closes }); // both ends inclusive, either open
+```
+
+`union` fires whenever any member does and exhausts only once every member has. `exclude` removes
+the occurrences another schedule names, matched exactly to the millisecond, the way RFC 5545
+removes exception dates from a recurrence set. `between` bounds a schedule to a window, firing
+nothing before it opens and exhausting once it has closed.
+
+### Time Zones & The Ends Of Time
+
+Every constructor that reads a timezone uses the runtime's own IANA data through `Intl` and decides
+daylight saving the same way: a wall time a spring forward gap swallows lands the gap's span later,
+and a wall time a fall back repeats lands on its first occurrence. The end of the range a `Date`
+can hold is exhaustion, never an error, and an invalid `Date` is refused loudly, at construction or
+on `next()`, never read as exhaustion.
+
+### Previewing & Date Arithmetic
+
+To see what a schedule will do, walk it:
+
+```ts
+import { add, preview, subtract } from '@observerly/orderly';
+
+preview(schedule, { after: new Date(), take: 5 }); // the next five occurrences, as Dates
+
+add(now, { hours: 1, minutes: 30 }); // a Duration: days, hours, minutes, seconds, milliseconds
+subtract(deadline, { days: 1 });
+```
+
 ## Requirements
 
 orderly runs on [workerd](https://github.com/cloudflare/workerd) and is tested inside it. It ships
