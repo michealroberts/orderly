@@ -94,3 +94,90 @@ describe('createProducer batches and validation', () => {
 });
 
 /*****************************************************************************************************************/
+
+// A queue that records what it was handed, because a delay is not observable through the real binding.
+const recording = () => {
+  const sends: { body: unknown; options: QueueSendOptions | undefined }[] = [];
+
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion
+  const queue = {
+    send: (body: unknown, options?: Readonly<QueueSendOptions>) => {
+      sends.push({ body, options });
+
+      return Promise.resolve();
+    },
+    sendBatch: () => Promise.resolve(),
+  } as unknown as Queue<string>;
+
+  return { queue, sends };
+};
+
+/*****************************************************************************************************************/
+
+describe('createProducer sends at an instant', () => {
+  it('holds the message back until the instant, rounding the delay up so it never arrives early', async () => {
+    const { queue, sends } = recording();
+
+    await createProducer(queue).send('hello', { at: new Date(Date.now() + 3_600_000) });
+
+    expect(sends).toStrictEqual([{ body: 'hello', options: { delaySeconds: 3600 } }]);
+  });
+
+  it('sends at once for an instant already passed', async () => {
+    const { queue, sends } = recording();
+
+    await createProducer(queue).send('hello', { at: new Date(Date.now() - 5_000) });
+
+    expect(sends).toStrictEqual([{ body: 'hello', options: { delaySeconds: 0 } }]);
+  });
+
+  it('accepts an instant exactly as far away as a queue holds a message back', async () => {
+    const { queue, sends } = recording();
+
+    await createProducer(queue).send('hello', {
+      at: new Date(Date.now() + MAXIMUM_DELAY_SECONDS * 1000),
+    });
+
+    expect(sends).toStrictEqual([
+      { body: 'hello', options: { delaySeconds: MAXIMUM_DELAY_SECONDS } },
+    ]);
+  });
+
+  it('reaches the real binding with an instant', async () => {
+    const producer = createProducer(env.QUEUE);
+
+    await expect(
+      producer.send('hello', { at: new Date(Date.now() + 60_000) }),
+    ).resolves.toBeUndefined();
+  });
+});
+
+/*****************************************************************************************************************/
+
+describe('createProducer refusal of an instant it cannot honour', () => {
+  it('refuses an instant further away than a queue holds a message back, rather than clamping it', async () => {
+    const producer = createProducer(env.QUEUE);
+
+    await expect(
+      producer.send('hello', { at: new Date(Date.now() + (MAXIMUM_DELAY_SECONDS + 1) * 1000) }),
+    ).rejects.toThrow('the furthest a queue holds a message back');
+  });
+
+  it('refuses a delay and an instant together', async () => {
+    const producer = createProducer(env.QUEUE);
+
+    await expect(producer.send('hello', { delaySeconds: 60, at: new Date() })).rejects.toThrow(
+      'send() takes a delay or an instant to send at, not both',
+    );
+  });
+
+  it('refuses an invalid Date', async () => {
+    const producer = createProducer(env.QUEUE);
+
+    await expect(producer.send('hello', { at: new Date(Number.NaN) })).rejects.toThrow(
+      'send() requires a valid Date to send at',
+    );
+  });
+});
+
+/*****************************************************************************************************************/
