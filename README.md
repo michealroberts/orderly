@@ -213,8 +213,9 @@ outcome for every message, with failures recorded as fact then decision.
 A schedule is the vocabulary for when something should happen, and it reduces to one pure function:
 `next(after)` returns the first occurrence strictly after the instant given, or `null` once nothing
 will ever follow. Every constructor below produces one, every combinator takes and returns one, and
-because the same instant in always yields the same instant out, every worker on every replay
-computes the same series. The module depends on nothing but `Intl`.
+because the same instant always yields the same occurrence, every worker on every replay computes
+the same series. The module depends on nothing but `Intl`, and its sun schedules on observerly's
+own astrometry.
 
 ```ts
 import type { Schedule } from '@observerly/orderly';
@@ -235,6 +236,7 @@ const hourly: Schedule = { next: after => new Date(after.getTime() + 3_600_000) 
 | `every(1).months({ on: 31 })`                                              | The thirty first of each month that has one; the rest are skipped, never clamped.                                                                             |
 | `cron('0 9 * * 2-6', { timezone: 'Europe/London' })`                       | A crontab expression, five fields as Cloudflare reads them: weekdays at nine in London.                                                                       |
 | `recurrenceRule('FREQ=MONTHLY;BYDAY=2MO', { from })`                       | A calendar's recurrence rule: the second Monday of every month, counted from `from`.                                                                          |
+| `sunrise({ latitude, longitude })`                                         | Each sunrise seen from a place on Earth, to the almanac convention; none through a polar day or night, when the Sun stays up or down.                         |
 | `union([weekdays, weekends])`                                              | Several schedules as one: fires whenever any member does, and exhausts once every member has.                                                                 |
 | `exclude(mornings, christmas)`                                             | Every occurrence of the first, less those the second names exactly.                                                                                           |
 | `between(hourly, { from, until })`                                         | Only within the window: nothing before it opens or after it closes, both ends inclusive, either open.                                                         |
@@ -318,6 +320,102 @@ rather than ignored, because a rule quietly stripped of what narrows it fires fa
 it was asked to. Two choices are stricter than the specification: a counted weekday beside
 `BYMONTHDAY` is refused, and the frequencies below a day step in instants, so an hourly rule stays
 hourly across a daylight saving transition rather than repeating or skipping an hour of wall clock.
+
+### The Sun
+
+The Sun keeps its own calendar, so its schedules are computed rather than declared: name a place on
+Earth, and each occurrence is the instant the upper limb of the Sun touches the horizon there, to
+the standard almanac convention, refraction and the height of the observer included. It is the one
+place orderly reaches for astronomy, through observerly's own
+[astrometry](https://github.com/observerly/astrometry).
+
+```ts
+import { preview, sunrise } from '@observerly/orderly';
+
+const greenwich = { latitude: 51.4769, longitude: -0.0005, elevation: 46 };
+
+sunrise(greenwich).next(new Date()); // the coming sunrise at Greenwich, strictly after now
+preview(sunrise(greenwich), { after: new Date(), take: 7 }); // a week of them, as Dates
+```
+
+Latitude and longitude are degrees, north and east positive; the elevation is metres above sea
+level, sea level when omitted; and a place that is not on Earth is refused at construction. Through
+a polar day or a polar night the Sun stays above the horizon or below it, and those days simply
+have no occurrence: the schedule walks on to the first sunrise after them. It searches four hundred
+days before exhausting, which only the poles reach, where astrometry finds no sunrise on any day,
+and the tenth of a degree around them, where its day-by-day search misses the one crossing in some
+years.
+
+A queue holds a message back a day at most, and outside the polar circles a day holds a sunrise:
+one most days, none through a polar night, and now and then two, when sunrise drifts across
+midnight UTC. So a cron trigger that runs once a day can hand the coming day's sunrises to the
+queue, and the queue delivers each on time:
+
+```ts
+// worker.ts
+import {
+  add,
+  between,
+  defineQueue,
+  preview,
+  sunrise,
+  withFixedRetryBackoff,
+  type QueueBody,
+} from '@observerly/orderly';
+
+import { WorkflowEntrypoint, type WorkflowEvent, type WorkflowStep } from 'cloudflare:workers';
+
+import { z } from 'zod';
+
+const greenwich = { latitude: 51.4769, longitude: -0.0005, elevation: 46 };
+
+const closedowns = defineQueue({
+  name: 'closedowns',
+  schema: z.object({ observatory: z.string() }),
+});
+
+type Payload = QueueBody<typeof closedowns>;
+
+export default {
+  // Each midnight UTC, a cron trigger hands the sunrises of the coming day to the queue.
+  async scheduled(controller, env) {
+    const now = new Date(controller.scheduledTime);
+
+    const within = between(sunrise(greenwich), { until: add(now, { days: 1 }) });
+
+    for (const at of preview(within, { after: now, take: 2 })) {
+      await closedowns.producer(env.CLOSEDOWNS).send({ observatory: 'greenwich' }, { at });
+    }
+  },
+
+  // Delivered at sunrise, each message starts the Workflow that closes the observatory down.
+  queue: (batch, env) =>
+    closedowns.consumer({
+      retry: withFixedRetryBackoff({ delaySeconds: 30, limit: 3 }),
+      handle: message => env.CLOSEDOWN.create({ params: message }),
+    })(batch),
+} satisfies ExportedHandler<Cloudflare.Env>;
+
+export class Closedown extends WorkflowEntrypoint<Cloudflare.Env, Payload> {
+  override async run(event: WorkflowEvent<Payload>, step: WorkflowStep) {
+    await step.do('park the mount', () => park(event.payload.observatory));
+
+    await step.do('close the roof', () => close(event.payload.observatory));
+  }
+}
+```
+
+```jsonc
+// wrangler.jsonc
+{
+  "triggers": { "crons": ["0 0 * * *"] },
+  "queues": {
+    "producers": [{ "binding": "CLOSEDOWNS", "queue": "closedowns" }],
+    "consumers": [{ "queue": "closedowns", "max_batch_size": 1, "max_retries": 3 }],
+  },
+  "workflows": [{ "name": "closedown", "binding": "CLOSEDOWN", "class_name": "Closedown" }],
+}
+```
 
 ### Combining Schedules
 
