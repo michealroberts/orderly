@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@observerly/astrometry':
+        specifier: 0.69.0
+        version: 0.69.0
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 0.18.5
@@ -555,6 +559,9 @@ packages:
     resolution: {integrity: sha512-6QEf6yqFbETdwGITKq57aYoPfX/3K8XFNwsAlx0C1M7o8cb79sv1M3w+tWuWvIcSbNqrLF7OD7YpZMVVz335hQ==}
     engines: {node: '>=20.0.0'}
 
+  '@observerly/astrometry@0.69.0':
+    resolution: {integrity: sha512-bgPl2sKbq+T1ixdDTThsYPFx7TgVLRnR2Xaab0CC+vxIEc+tKNolbEGQx+o1mmo2nMn74gMTZVR21Is5co/rKA==}
+
   '@oxc-project/types@0.144.0':
     resolution: {integrity: sha512-nuhZIOLuI6TFQ32I/WnUx+SCPY7SdSKwgnFHydAuoS1+Z4BRcaP+RRJmGzl9lw+0OFF7UmaESf7KQRXaNLHypg==}
 
@@ -964,6 +971,9 @@ packages:
 
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
+
+  '@types/geojson@7946.0.16':
+    resolution: {integrity: sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg==}
 
   '@types/node@24.13.3':
     resolution: {integrity: sha512-Dh8vAsV36ig5wa9OX4pXvMc9D3Veibfw2wix0CUwYODLD8nkj9UsLjASr49nPg+2eKzxhBV+v7L8pXvT4e639Q==}
@@ -2398,6 +2408,10 @@ snapshots:
       tinyglobby: 0.2.17
       yaml: 2.9.0
 
+  '@observerly/astrometry@0.69.0':
+    dependencies:
+      '@types/geojson': 7946.0.16
+
   '@oxc-project/types@0.144.0': {}
 
   '@oxfmt/binding-android-arm-eabi@0.63.0':
@@ -2610,6 +2624,8 @@ snapshots:
   '@types/deep-eql@4.0.2': {}
 
   '@types/estree@1.0.9': {}
+
+  '@types/geojson@7946.0.16': {}
 
   '@types/node@24.13.3':
     dependencies:
