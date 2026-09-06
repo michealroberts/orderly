@@ -26,9 +26,12 @@ export interface Producer<Body> {
   // Enqueues one body, optionally held back: by a delay, floored and clamped into the platform bounds, or until
   // an instant, refused rather than clamped when it lies further away than a queue holds a message back.
   send: (body: Body, options?: { delaySeconds?: number; at?: Date }) => Promise<void>;
-  // Enqueues many bodies in one call, optionally all delayed. An empty list resolves without touching the
-  // platform.
-  sendBatch: (bodies: readonly Body[], options?: { delaySeconds?: number }) => Promise<void>;
+  // Enqueues many bodies in one call, optionally all held back the same way send() holds one back: by a delay,
+  // or until an instant. An empty list resolves without touching the platform, once its options are checked.
+  sendBatch: (
+    bodies: readonly Body[],
+    options?: { delaySeconds?: number; at?: Date },
+  ) => Promise<void>;
 }
 
 /*****************************************************************************************************************/
@@ -46,22 +49,23 @@ const clamped = (delaySeconds: number | undefined): { delaySeconds: number } | u
 // The instant a send is held back until, as milliseconds, or undefined when it carries a delay or nothing. Read
 // before anything is awaited, so an invalid Date, or a delay given beside the instant, is refused before the
 // body is parsed, and so the caller's Date is never held across that parse: a Date is mutable, and one changed
-// while the body was being validated must not change what was asked for.
+// while the body was being validated must not change what was asked for. The method names itself in a refusal.
 const instantOf = (
   options: { delaySeconds?: number; at?: Date } | undefined,
+  method: 'send()' | 'sendBatch()',
 ): number | undefined => {
   if (options?.at === undefined) {
     return undefined;
   }
 
   if (options.delaySeconds !== undefined) {
-    throw new RangeError('send() takes a delay or an instant to send at, not both');
+    throw new RangeError(`${method} takes a delay or an instant to send at, not both`);
   }
 
   const instant = options.at.getTime();
 
   if (Number.isNaN(instant)) {
-    throw new RangeError('send() requires a valid Date to send at');
+    throw new RangeError(`${method} requires a valid Date to send at`);
   }
 
   return instant;
@@ -83,6 +87,21 @@ const secondsUntil = (instant: number): number => {
   }
 
   return seconds;
+};
+
+/*****************************************************************************************************************/
+
+// The delay a send carries, read from the clock at the moment the message is handed over: the seconds until the
+// instant read earlier, or the seconds given. It is read last because the delay counts from that moment: read
+// before the parse, the time the parse took would be added to it, and the message would land late by exactly
+// that long.
+const delayOf = (
+  instant: number | undefined,
+  options: { delaySeconds?: number } | undefined,
+): { delaySeconds: number } | undefined => {
+  return instant === undefined
+    ? clamped(options?.delaySeconds)
+    : { delaySeconds: secondsUntil(instant) };
 };
 
 /*****************************************************************************************************************/
@@ -111,21 +130,17 @@ export const createProducer = <Body>(
 
   return {
     send: async (body, sendOptions) => {
-      const instant = instantOf(sendOptions);
+      // The instant is read before the parse and the clock after it; delayOf() says why.
+      const instant = instantOf(sendOptions, 'send()');
 
       const parsed = await parse(body);
 
-      // The clock is read last, at the moment the message is handed over, because the delay counts from that
-      // moment: read before the parse, the time the parse took would be added to it, and the message would
-      // land late by exactly that long.
-      await queue.send(
-        parsed,
-        instant === undefined
-          ? clamped(sendOptions?.delaySeconds)
-          : { delaySeconds: secondsUntil(instant) },
-      );
+      await queue.send(parsed, delayOf(instant, sendOptions));
     },
     sendBatch: async (bodies, sendOptions) => {
+      // Checked before the empty list returns, so a misuse is refused whether or not there was anything to send.
+      const instant = instantOf(sendOptions, 'sendBatch()');
+
       if (bodies.length === 0) {
         return;
       }
@@ -134,7 +149,7 @@ export const createProducer = <Body>(
 
       await queue.sendBatch(
         parsed.map(body => ({ body })),
-        clamped(sendOptions?.delaySeconds),
+        delayOf(instant, sendOptions),
       );
     },
   };
