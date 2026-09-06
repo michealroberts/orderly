@@ -4,8 +4,8 @@ Single file, no pushing. Type-safe middleware that brings a little bit of order 
 
 orderly removes the two failure modes every raw queue consumer carries: messages that are never
 decided, and one bad message crashing a whole batch. Every message resolves to exactly one explicit
-outcome, every outcome is recorded as an event, and the consumer never rejects. Zero runtime
-dependencies.
+outcome, every outcome is recorded as an event, and the consumer never rejects. Zero third-party
+runtime dependencies.
 
 ## Installation
 
@@ -358,8 +358,9 @@ subtract(deadline, { days: 1 });
 ## Requirements
 
 orderly runs on [workerd](https://github.com/cloudflare/workerd) and is tested inside it. It ships
-as ESM with TypeScript declarations, requires nothing at runtime, and follows Standard Schema
-rather than depending on any validation library.
+as ESM with TypeScript declarations and follows Standard Schema rather than depending on any
+validation library. Its one runtime dependency is observerly's own `@observerly/astrometry`, which
+itself depends on nothing at runtime; a guard fails the package checks should another ever appear.
 
 ## Contributing
 

@@ -52,6 +52,9 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tests/tsconfig.json && tsc --noEmit -p scripts/tsconfig.json"
   },
+  "dependencies": {
+    "@observerly/astrometry": "0.69.0"
+  },
   "devDependencies": {
     "@arethetypeswrong/cli": "0.18.5",
     "@changesets/changelog-github": "1.0.0",
