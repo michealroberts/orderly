@@ -36,6 +36,15 @@ export interface QueueContract<Body> {
 
 /*****************************************************************************************************************/
 
+// The body a contract carries, taken from the contract itself, so the shape is named once in the schema and
+// read from the contract everywhere else: a row type, a Workflow's parameters, a handler's argument. Anything
+// that is not a contract yields never, so a mistaken argument fails where it is written. The tuple keeps the
+// conditional from distributing over a union, so a contract joined with undefined fails too rather than
+// quietly yielding the body, as does a union of contracts: one contract, one body.
+export type QueueBody<Contract> = [Contract] extends [QueueContract<infer Body>] ? Body : never;
+
+/*****************************************************************************************************************/
+
 // The shared contract: the payload type and its schema declared once, with both ends derived from it. What the
 // producer sends is what the consumer's handler receives, and neither side can drift alone.
 export const defineQueue = <Body>(options: DefineQueueOptions<Body>): QueueContract<Body> => {

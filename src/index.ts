@@ -68,6 +68,7 @@ export type {
   CreateProducerOptions,
   DefineQueueOptions,
   Producer,
+  QueueBody,
   QueueContract,
 } from './queues/index';
 
