@@ -8,7 +8,7 @@
 
 export { defineQueue } from './contract';
 
-export type { DefineQueueOptions, QueueContract } from './contract';
+export type { DefineQueueOptions, QueueBody, QueueContract } from './contract';
 
 export { createProducer } from './producer';
 
