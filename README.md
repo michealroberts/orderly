@@ -31,7 +31,7 @@ Declare the payload once, and derive both ends from it:
 
 ```ts
 // contracts/emails.ts
-import { defineQueue } from '@observerly/orderly';
+import { defineQueue, type QueueBody } from '@observerly/orderly';
 
 import { z } from 'zod';
 
@@ -40,10 +40,12 @@ const payload = z.object({
   kind: z.enum(['welcome', 'digest', 'receipt']),
 });
 
-export type EmailPayload = z.infer<typeof payload>;
+// Any Standard Schema library plugs in: zod, valibot, arktype, or a plain function that throws. The
+// body's type is inferred from the schema, so it is named once, here.
+export const emails = defineQueue({ name: 'emails', schema: payload });
 
-// Any Standard Schema library plugs in: zod, valibot, arktype, or a plain function that throws.
-export const emails = defineQueue<EmailPayload>({ name: 'emails', schema: payload });
+// And read from the contract wherever a name for it is needed.
+export type EmailPayload = QueueBody<typeof emails>;
 ```
 
 ```ts
