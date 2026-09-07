@@ -237,6 +237,7 @@ const hourly: Schedule = { next: after => new Date(after.getTime() + 3_600_000) 
 | `cron('0 9 * * 2-6', { timezone: 'Europe/London' })`                       | A crontab expression, five fields as Cloudflare reads them: weekdays at nine in London.                                                                       |
 | `recurrenceRule('FREQ=MONTHLY;BYDAY=2MO', { from })`                       | A calendar's recurrence rule: the second Monday of every month, counted from `from`.                                                                          |
 | `sunrise({ latitude, longitude })`                                         | Each sunrise seen from a place on Earth, to the almanac convention; none through a polar day or night, when the Sun stays up or down.                         |
+| `sunset({ latitude, longitude })`                                          | Each sunset seen from the same place, the mirror of sunrise: the upper limb of the Sun touching the horizon as it sets.                                       |
 | `union([weekdays, weekends])`                                              | Several schedules as one: fires whenever any member does, and exhausts once every member has.                                                                 |
 | `exclude(mornings, christmas)`                                             | Every occurrence of the first, less those the second names exactly.                                                                                           |
 | `between(hourly, { from, until })`                                         | Only within the window: nothing before it opens or after it closes, both ends inclusive, either open.                                                         |
@@ -324,26 +325,28 @@ hourly across a daylight saving transition rather than repeating or skipping an 
 ### The Sun
 
 The Sun keeps its own calendar, so its schedules are computed rather than declared: name a place on
-Earth, and each occurrence is the instant the upper limb of the Sun touches the horizon there, to
-the standard almanac convention, refraction and the height of the observer included. It is the one
-place orderly reaches for astronomy, through observerly's own
+Earth, and each occurrence is the instant the upper limb of the Sun touches the horizon there,
+rising or setting, to the standard almanac convention, refraction and the height of the observer
+included. It is the one place orderly reaches for astronomy, through observerly's own
 [astrometry](https://github.com/observerly/astrometry).
 
 ```ts
-import { preview, sunrise } from '@observerly/orderly';
+import { preview, sunrise, sunset } from '@observerly/orderly';
 
 const greenwich = { latitude: 51.4769, longitude: -0.0005, elevation: 46 };
 
 sunrise(greenwich).next(new Date()); // the coming sunrise at Greenwich, strictly after now
-preview(sunrise(greenwich), { after: new Date(), take: 7 }); // a week of them, as Dates
+sunset(greenwich).next(new Date()); // and the coming sunset
+preview(sunrise(greenwich), { after: new Date(), take: 7 }); // a week of sunrises, as Dates
 ```
 
 Latitude and longitude are degrees, north and east positive; the elevation is metres above sea
 level, sea level when omitted; and a place that is not on Earth is refused at construction. Through
 a polar day or a polar night the Sun stays above the horizon or below it, and those days simply
-have no occurrence: the schedule walks on to the first sunrise after them. It searches four hundred
-days before exhausting, which only the poles reach, where astrometry finds no sunrise on any day,
-and the tenth of a degree around them, where its day-by-day search misses the one crossing in some
+have no occurrence: the schedule walks on to the first sunrise or sunset after them. It searches
+four hundred days before exhausting, which only the poles and the twentieth of a degree around
+them reach: there astrometry's day-by-day search catches the one crossing of the horizon a year in
+some years only, about one year in two at the poles themselves, and leaves gaps of three or four
 years.
 
 A queue holds a message back a day at most, and outside the polar circles a day holds a sunrise:
