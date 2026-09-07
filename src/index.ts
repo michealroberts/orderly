@@ -38,6 +38,7 @@ export {
   preview,
   recurrenceRule,
   subtract,
+  sunrise,
   union,
 } from './schedules/index';
 
@@ -51,6 +52,7 @@ export type {
   CronOptions,
   Duration,
   Interval,
+  Observer,
   ParsedCron,
   ParsedRecurrenceRule,
   PreviewOptions,

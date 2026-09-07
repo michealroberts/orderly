@@ -52,6 +52,10 @@ export { recurrenceRule } from './recurrence-schedule';
 
 export type { RecurrenceRuleOptions } from './recurrence-schedule';
 
+export { sunrise } from './sun';
+
+export type { Observer } from './sun';
+
 export type { WallTime, Weekday } from './timezone';
 
 export { union } from './union';

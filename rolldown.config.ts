@@ -19,6 +19,11 @@ export default defineConfig({
   // orderly runs on workerd, so the build must assume no host runtime at all.
   platform: 'neutral',
 
+  // astrometry is installed beside orderly rather than bundled into it, so a
+  // consumer holds one copy however many packages share it, and the one
+  // dependency the guard allows stays a dependency rather than becoming dist.
+  external: [/^@observerly\/astrometry(?:\/|$)/u],
+
   // Matches the tsconfig target. Deliberately not derived from engines.node,
   // which describes which Node versions may install the package rather than
   // the runtime the output executes on.
