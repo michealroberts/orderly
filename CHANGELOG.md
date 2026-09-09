@@ -1,5 +1,21 @@
 # @observerly/orderly
 
+## 0.3.0
+
+### Minor Changes
+
+- [#66](https://github.com/michealroberts/orderly/pull/66) [`96a99f0`](https://github.com/michealroberts/orderly/commit/96a99f08a5ac11b296a978fc336460f7c1a68797) Thanks [@michealroberts](https://github.com/michealroberts)! - Add the QueueBody type: the body a defineQueue() contract carries, taken from the contract itself, so the shape is named once in the schema and read from the contract everywhere else.
+
+- [#64](https://github.com/michealroberts/orderly/pull/64) [`15030aa`](https://github.com/michealroberts/orderly/commit/15030aa8ebb274820876442a50196f0e749727e9) Thanks [@michealroberts](https://github.com/michealroberts)! - Add an at option to a producer's send(): the message is held back until the instant given, rounded up so it never arrives early, and refused rather than clamped when the instant lies further away than a queue holds a message back.
+
+- [#65](https://github.com/michealroberts/orderly/pull/65) [`75f7773`](https://github.com/michealroberts/orderly/commit/75f77737c6ec843c76ae4f1a450258f21282a5c0) Thanks [@michealroberts](https://github.com/michealroberts)! - Add the at option to a producer's sendBatch(): every body in the batch is held back until the instant given, read the way send() reads it, rounded up so none arrives early and refused rather than clamped when the instant lies further away than a queue holds a message back.
+
+- [#69](https://github.com/michealroberts/orderly/pull/69) [`0c0fb3f`](https://github.com/michealroberts/orderly/commit/0c0fb3fead941b8bce3b1cb39a9db820e19eaacd) Thanks [@michealroberts](https://github.com/michealroberts)! - Add sunrise(observer), a schedule of the sunrises seen from a place on Earth, resolved with @observerly/astrometry to the standard almanac convention: latitude, longitude and an optional elevation in metres are validated up front, each next occurrence lies strictly after the instant asked from, the days of a polar day or a polar night are walked past, and the schedule exhausts where no sunrise falls within four hundred days, as at the poles.
+
+- [#70](https://github.com/michealroberts/orderly/pull/70) [`c2534aa`](https://github.com/michealroberts/orderly/commit/c2534aa84f5eed6ea83b155458478de74ca9c984) Thanks [@michealroberts](https://github.com/michealroberts)! - Add sunset(observer), the mirror of sunrise(): a schedule of the sunsets seen from a place on Earth, resolved with @observerly/astrometry to the standard almanac convention, with the same observer validation, the same strictly-after walk from day to day past polar days and nights, and the same four hundred day bound before exhausting.
+
+- [#68](https://github.com/michealroberts/orderly/pull/68) [`aa7b520`](https://github.com/michealroberts/orderly/commit/aa7b520ded08af76c1103929108dd044d461cfe9) Thanks [@michealroberts](https://github.com/michealroberts)! - Add @observerly/astrometry 0.69.0 as orderly's one runtime dependency, observerly's own library with no runtime dependencies of its own, ahead of the sun schedules built on it; the dependency guard now admits exactly that name and fails the package checks on any other.
+
 ## 0.2.0
 
 ### Minor Changes
