@@ -6,7 +6,7 @@
 
 /*****************************************************************************************************************/
 
-import { getSunrise } from '@observerly/astrometry/sun';
+import { getSunrise, getSunset } from '@observerly/astrometry/sun';
 
 import { MAXIMUM_INSTANT_IN_MILLISECONDS, MILLISECONDS_IN_DAY } from './constants';
 
@@ -23,7 +23,7 @@ import type { Schedule } from './contract';
 
 // A place on Earth to see the Sun from: latitude and longitude in degrees, north and east positive, and an
 // elevation above sea level in metres, sea level when omitted. Height brings the horizon down, and with it
-// the sunrise forward.
+// the sunrise forward and the sunset back.
 export type Observer = {
   latitude: number;
   longitude: number;
@@ -33,18 +33,20 @@ export type Observer = {
 /*****************************************************************************************************************/
 
 // How many days the walk asks before calling the schedule exhausted: a year and change, which reaches the
-// next sunrise from anywhere the Sun rises at least once a year, as it does everywhere. Within a tenth of a
-// degree of the poles, though, astrometry's day-by-day search steps over the one crossing of the horizon in
-// some years, and at the poles themselves it finds none, so a gap longer than this reads as exhaustion and
-// the walk ends rather than searching on forever.
+// next event from anywhere the Sun rises and sets at least once a year, as it does everywhere. Within a
+// twentieth of a degree of the poles, though, astrometry's day-by-day search catches the one crossing of the
+// horizon a year in some years only, sunrise and sunset alike, and at the poles themselves in about one year
+// in two, leaving gaps of three or four years. A gap longer than this bound reads as exhaustion, so the walk
+// ends there rather than searching on forever.
 const SEARCH_LIMIT_IN_DAYS = 400;
 
 /*****************************************************************************************************************/
 
 // astrometry resolves a date's event about the solar transit nearest the date's mean solar noon, which for an
 // observer at the far west falls a full day past the date's midnight, and it refuses a date whose search
-// leaves the range a Date can hold. Asked for the last day of that range by an observer more than 150 degrees
-// west, it throws; asked for the day before, it never does. So the walk keeps two days clear of either end,
+// leaves the range a Date can hold. Asked for the last day of that range, it throws for an observer west of
+// Greenwich by more than 150 degrees for a sunrise and by more than 30 for a sunset, the search for a sunset
+// reaching later; asked for the day before, it never does. So the walk keeps two days clear of either end,
 // one more than the calendar walks keep, and surrenders those days at the end of the year 275760 deliberately,
 // as they do, rather than resolving the edge by a strategy of its own.
 const HORIZON_IN_MILLISECONDS = MAXIMUM_INSTANT_IN_MILLISECONDS - 2 * MILLISECONDS_IN_DAY;
@@ -84,9 +86,9 @@ const observerOf = (observer: Observer, method: string): Observer => {
 /*****************************************************************************************************************/
 
 // The schedule of an event for an observer: each next occurrence the first the days yield strictly after the
-// instant. The days are asked from the UTC day before the instant's, since an observer far east of Greenwich
-// sees the Sun rise before the UTC date astrometry files that sunrise under, and a day's event never precedes
-// the day before's, so the first found after the instant is the next.
+// instant. The days are asked from the UTC day before the instant's, because the event astrometry files under
+// a date can fall on the day after it, as a sunset does for an observer far west of Greenwich, and a day's
+// event never precedes the day before's, so the first found after the instant is the next.
 const walk = (resolve: Resolve, method: string, observer: Observer): Schedule => {
   const place = observerOf(observer, method);
 
@@ -131,7 +133,16 @@ const walk = (resolve: Resolve, method: string, observer: Observer): Schedule =>
 
 // The sunrises seen from a place on Earth, each the instant the upper limb of the Sun touches the horizon as
 // it rises, on the days it does: none through a polar day or a polar night, when the Sun stays above the
-// horizon or below it, and at the poles none at all, where the schedule exhausts rather than searches on.
+// horizon or below it, and at the poles one in about one year in two, where the schedule may exhaust rather
+// than search on.
 export const sunrise = (observer: Observer): Schedule => walk(getSunrise, 'sunrise()', observer);
+
+/*****************************************************************************************************************/
+
+// The sunsets seen from a place on Earth, each the instant the upper limb of the Sun touches the horizon as
+// it sets, on the days it does: none through a polar day or a polar night, when the Sun stays above the
+// horizon or below it, and at the poles one in about one year in two, where the schedule may exhaust rather
+// than search on.
+export const sunset = (observer: Observer): Schedule => walk(getSunset, 'sunset()', observer);
 
 /*****************************************************************************************************************/

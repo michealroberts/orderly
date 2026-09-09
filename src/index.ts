@@ -39,6 +39,7 @@ export {
   recurrenceRule,
   subtract,
   sunrise,
+  sunset,
   union,
 } from './schedules/index';
 

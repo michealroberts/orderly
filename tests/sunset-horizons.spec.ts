@@ -8,22 +8,16 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { getSunrise } from '@observerly/astrometry/sun';
+import { getSunset } from '@observerly/astrometry/sun';
 
-import { preview, sunrise, type Observer } from '../src/index';
+import { preview, sunset, type Observer } from '../src/index';
 
 /*****************************************************************************************************************/
 
 // Inside the Arctic Circle: the almanac has the midnight sun from late May to late July and the polar night
-// from late November to mid January, the instants below being astrometry's own for the last sunrise before
+// from late November to mid January, the instants below being astrometry's own for the last sunset before
 // each and the first after it.
 const TROMSO: Observer = { latitude: 69.6492, longitude: 18.9553 };
-
-/*****************************************************************************************************************/
-
-// Where astrometry's day-by-day search catches the one sunrise a year in about one year in two: from the
-// solstice below, the next it finds is in March 2029, well past the days the walk searches.
-const NORTH_POLE: Observer = { latitude: 90, longitude: 0 };
 
 /*****************************************************************************************************************/
 
@@ -40,16 +34,16 @@ const MILLISECONDS_IN_DAY = 86_400_000;
 
 /*****************************************************************************************************************/
 
-// The sunrises astrometry files under the UTC dates of a run of days, in order, less any before the instant
+// The sunsets astrometry files under the UTC dates of a run of days, in order, less any before the instant
 // the run starts from: the answer a walk from that instant must reproduce.
-const sunrisesFiledUnder = (after: Date, days: number, observer: Readonly<Observer>): Date[] => {
+const sunsetsFiledUnder = (after: Date, days: number, observer: Readonly<Observer>): Date[] => {
   const filed: Date[] = [];
 
   for (let day = 0; day < days; day += 1) {
-    const rise = getSunrise(new Date(after.getTime() + day * MILLISECONDS_IN_DAY), observer);
+    const set = getSunset(new Date(after.getTime() + day * MILLISECONDS_IN_DAY), observer);
 
-    if (rise !== null && rise.getTime() > after.getTime()) {
-      filed.push(rise);
+    if (set !== null && set.getTime() > after.getTime()) {
+      filed.push(set);
     }
   }
 
@@ -58,49 +52,46 @@ const sunrisesFiledUnder = (after: Date, days: number, observer: Readonly<Observ
 
 /*****************************************************************************************************************/
 
-describe('sunrise() through polar day and night', () => {
+describe('sunset() through polar day and night', () => {
   it('skips the polar day, when the Sun never sets', () => {
-    expect(sunrise(TROMSO).next(new Date('2026-05-17T22:51:33.161Z'))).toStrictEqual(
-      new Date('2026-07-25T23:04:47.829Z'),
+    expect(sunset(TROMSO).next(new Date('2026-05-17T22:28:45.033Z'))).toStrictEqual(
+      new Date('2026-07-25T22:37:32.679Z'),
     );
   });
 
   it('skips the polar night, when the Sun never rises', () => {
-    expect(sunrise(TROMSO).next(new Date('2026-11-27T10:20:33.093Z'))).toStrictEqual(
-      new Date('2027-01-15T10:34:49.312Z'),
+    expect(sunset(TROMSO).next(new Date('2026-11-27T10:42:15.550Z'))).toStrictEqual(
+      new Date('2027-01-15T11:12:52.299Z'),
     );
   });
 
-  it('agrees with astrometry on every sunrise of a year', () => {
+  it('agrees with astrometry on every sunset of a year', () => {
     const after = new Date('2026-01-01T00:00:00Z');
 
-    const expected = sunrisesFiledUnder(after, 365, TROMSO);
+    const expected = sunsetsFiledUnder(after, 365, TROMSO);
 
-    expect(preview(sunrise(TROMSO), { after, take: expected.length })).toStrictEqual(expected);
-  });
-
-  it('exhausts at the pole, where the next sunrise astrometry finds lies years past the bound', () => {
-    expect(sunrise(NORTH_POLE).next(new Date('2026-06-21T00:00:00Z'))).toBeNull();
+    expect(preview(sunset(TROMSO), { after, take: expected.length })).toStrictEqual(expected);
   });
 });
 
 /*****************************************************************************************************************/
 
-describe('sunrise() at the ends of time', () => {
+describe('sunset() at the ends of time', () => {
   it('exhausts at the end of the range a Date can hold, without asking past it', () => {
-    expect(sunrise(LONDON).next(new Date(MAXIMUM_INSTANT))).toBeNull();
+    expect(sunset(LONDON).next(new Date(MAXIMUM_INSTANT))).toBeNull();
   });
 
-  it('asks nothing of the days astrometry refuses at the start of the range a Date can hold', () => {
-    expect(() => sunrise(LONDON).next(new Date(-MAXIMUM_INSTANT))).not.toThrow();
+  it('asks nothing astrometry refuses at the start of the range a Date can hold', () => {
+    expect(() => sunset(LONDON).next(new Date(-MAXIMUM_INSTANT))).not.toThrow();
   });
 
   it('exhausts short of the last day for an observer at the far west, which astrometry refuses', () => {
-    // Asked for the last representable day, astrometry throws for an observer this far west: its search for
-    // the day's transit leaves the range a Date can hold. A walk keeping one day clear would ask it.
+    // Asked for the last representable day, astrometry throws for any observer more than thirty degrees west
+    // of Greenwich, its search for a sunset reaching later than for a sunrise. Asked from midday on the day
+    // before, the walk has that day's sunset behind it and the last day ahead, and stops short of asking.
     const west: Observer = { latitude: 0, longitude: -180 };
 
-    expect(sunrise(west).next(new Date(MAXIMUM_INSTANT - MILLISECONDS_IN_DAY - 1))).toBeNull();
+    expect(sunset(west).next(new Date(MAXIMUM_INSTANT - MILLISECONDS_IN_DAY / 2))).toBeNull();
   });
 });
 

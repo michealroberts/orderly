@@ -52,7 +52,7 @@ export { recurrenceRule } from './recurrence-schedule';
 
 export type { RecurrenceRuleOptions } from './recurrence-schedule';
 
-export { sunrise } from './sun';
+export { sunrise, sunset } from './sun';
 
 export type { Observer } from './sun';
 
