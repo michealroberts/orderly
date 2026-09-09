@@ -208,6 +208,36 @@ statusOf(events); // 'pending' | 'running' | 'succeeded' | 'failed'
 The vocabulary is closed: `batch.received`, `message.started`, then a terminal mirror of the
 outcome for every message, with failures recorded as fact then decision.
 
+## Scheduled Work
+
+A queue can hold a message back, and that is how orderly runs work at an instant rather than now.
+`send()` and `sendBatch()` take the instant to send at, and the platform delivers the message once
+it has arrived:
+
+```ts
+import { add } from '@observerly/orderly';
+
+const producer = emails.producer(env.EMAILS);
+
+await producer.send({ userId: '42', kind: 'digest' }, { at: new Date('2026-01-15T09:00:00Z') });
+
+await producer.sendBatch(reminders, { at: add(new Date(), { hours: 6 }) }); // one instant for all
+```
+
+The seconds until the instant are counted from the moment the message is handed over, after its
+body has been validated, and rounded up, so a message never arrives early; an instant already
+passed sends at once. A queue holds a message back for a day at most, which is what
+`MAXIMUM_DELAY_SECONDS` names, and an instant further off than that is refused rather than moved,
+because an appointment quietly moved to tomorrow is not the appointment that was asked for. An
+instant beside `delaySeconds` is refused too, as is an invalid `Date`, each with a `RangeError`.
+`delaySeconds` on its own keeps the platform's manners: floored, and clamped into its bounds.
+
+Work further off than a day belongs to a schedule and a cron trigger. Once a day, ask the schedule
+for the occurrences within the coming day and hand each to the queue with `at`, a message a job.
+From there the queue is the clock: the consumer starts one Workflow per message as it lands, and
+the Workflow does the work at once rather than sleeping until it is due. [The Sun](#the-sun) shows
+the whole arrangement for an observatory that closes down at sunrise.
+
 ## Schedules
 
 A schedule is the vocabulary for when something should happen, and it reduces to one pure function:
