@@ -10,6 +10,12 @@ import { DurableObject } from 'cloudflare:workers';
 
 /*****************************************************************************************************************/
 
+// The Workflow the harness binds. Defined in its own module, and re-exported here because the runtime reads
+// Workflow classes from the worker's main module, which this file is.
+export { Echo, type EchoOutput, type EchoParams } from './echo';
+
+/*****************************************************************************************************************/
+
 export type StepEvent = 'started' | 'succeeded' | 'failed';
 
 /*****************************************************************************************************************/

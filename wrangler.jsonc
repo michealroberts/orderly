@@ -29,6 +29,18 @@
       "storage": "sqlite",
     },
   },
+  // A Workflow the harness can start and read back. It lives in the fixture for
+  // the same reason the Durable Object above does: the runtime instantiates it
+  // from a real module, and it is scaffolding for the harness rather than part
+  // of the published package. The vitest pool binds Workflow classes exported
+  // by this worker, so instances run inside workerd like everything else.
+  "workflows": [
+    {
+      "name": "echo",
+      "binding": "ECHO",
+      "class_name": "Echo",
+    },
+  ],
   // A producer and a consumer over the same queue, so tests can exercise both
   // ends of the middleware: sending a message, and receiving it as a batch.
   // The values mirror a realistic consumer rather than the defaults, so that
