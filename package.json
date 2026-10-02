@@ -10,15 +10,15 @@
     "workerd",
     "workers"
   ],
-  "homepage": "https://github.com/michealroberts/orderly#readme",
+  "homepage": "https://github.com/observerly/orderly#readme",
   "bugs": {
-    "url": "https://github.com/michealroberts/orderly/issues"
+    "url": "https://github.com/observerly/orderly/issues"
   },
   "license": "MIT",
   "author": "Micheal J. Roberts <michael@observerly.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/michealroberts/orderly.git"
+    "url": "git+https://github.com/observerly/orderly.git"
   },
   "files": [
     "dist"

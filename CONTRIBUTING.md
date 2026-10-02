@@ -54,7 +54,7 @@ retyping it.
 
 ### 1. Fork The Repository
 
-[Fork @observerly/orderly](https://github.com/michealroberts/orderly/fork).
+[Fork @observerly/orderly](https://github.com/observerly/orderly/fork).
 
 ### 2. Clone The Repository
 
@@ -136,13 +136,13 @@ Reviews are about the change, not the person making it. Expect questions; ask th
 
 ## Bug Reports
 
-Open an [issue](https://github.com/michealroberts/orderly/issues). A report is most useful when it
+Open an [issue](https://github.com/observerly/orderly/issues). A report is most useful when it
 includes the queue configuration involved, the batch or message that triggered it, and what you
 expected to happen instead.
 
 ## Feature Requests
 
-Also an [issue](https://github.com/michealroberts/orderly/issues). Describe the queue behaviour you
+Also an [issue](https://github.com/observerly/orderly/issues). Describe the queue behaviour you
 are trying to achieve rather than the API you imagine; there may be a simpler route to it.
 
 ## Code Of Conduct

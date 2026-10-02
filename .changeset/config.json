@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@4.0.0/schema.json",
-  "changelog": ["@changesets/changelog-github", { "repo": "michealroberts/orderly" }],
+  "changelog": ["@changesets/changelog-github", { "repo": "observerly/orderly" }],
   "commit": false,
   "access": "public",
   "baseBranch": "main",

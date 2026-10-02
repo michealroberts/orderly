@@ -100,7 +100,7 @@ This needs configuring once, and the order matters:
 3. **Add the trusted publisher.** On npmjs.com, under the package's settings, add a GitHub Actions
    trusted publisher pointing at:
 
-   - Repository: `michealroberts/orderly`
+   - Repository: `observerly/orderly`
    - Workflow: `release.yml`
 
    Trusted publisher configurations created since May 2026 require the allowed actions to be
